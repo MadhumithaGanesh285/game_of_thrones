@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa"; // Import back arrow icon
 import { Button } from '@mui/material';
-import Throne from '../../assets/images/throne.mp4'
-
+import ChatBotButton from "../../assets/svg/ChatBot";
+import { BasicChat } from "@ebereplenty/chatbot";
 interface Character {
   id: number;
   firstName: string;
@@ -20,6 +20,7 @@ const CharacterDetails: React.FC = () => {
   const navigate = useNavigate();
   const [character, setCharacter] = useState<Character | null>(null);
   const [relatedCharacters, setRelatedCharacters] = useState<Character[]>([]);
+  const [chatStarted, setChatStarted] = useState(false);
 
   useEffect(() => {
     axios
@@ -46,7 +47,7 @@ const CharacterDetails: React.FC = () => {
   if (!character) return <h2>Loading...</h2>;
 
   return (
-    <div style={{ padding: "20px", position: "relative", minHeight: "100vh" }}>
+    <div style={{ padding: "20px", position: "relative", minHeight: "90vh" }}>
       {/* Go Back Button */}
       <Button
         onClick={() => navigate("/")}
@@ -102,6 +103,14 @@ const CharacterDetails: React.FC = () => {
           <p>No related Family Member.</p>
         )}
       </div>
+      {!chatStarted ?
+      <Button onClick={() => setChatStarted(true)} style={{position:'absolute', right:'0px', bottom:'0px'}}>
+      <ChatBotButton/>
+    </Button>
+    :
+    <BasicChat openAiApiKey={'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'}/>
+    }
+      
     </div>
   );
 };

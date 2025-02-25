@@ -20,7 +20,6 @@ import { useNavigate } from 'react-router-dom';
 
 //import image
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import Throne from '../../assets/images/throne.mp4';
 import Searchgif from '../../assets/images/searchGif.gif';
 import GOT from '../../assets/images/GOT.mp4';
 
@@ -99,12 +98,59 @@ const ListOfCharacters: React.FC = () => {
     width: 'auto'
   };
 
+  const welcomeScreenStyle: React.CSSProperties = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: 'justify',
+    color: "#fff",
+    fontSize: "2rem",
+    zIndex: 9999,
+    animation: "fadeOut 1s ease-in-out 2.5s forwards",
+  };
+
+  const welcomeTextStyle: React.CSSProperties = {
+    animation: "rotateZoomIn 2.5s ease-in-out",
+  };
+
+  // Add keyframes to the document
+  const styleSheet = document.styleSheets[0];
+  styleSheet.insertRule(`
+    @keyframes rotateZoomIn {
+      0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+      }
+     
+      100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+  `, styleSheet.cssRules.length);
+
+  styleSheet.insertRule(`
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  `, styleSheet.cssRules.length);
+
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchAndFilterCharacters, setSearchAndFilterCharacters] = useState<Character[]>([]);
+  const [showWelcome, setShowWelcome] = useState(true); // New state for animation
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFamily, setSelectedFamily] = useState<string>("All");
 
@@ -112,7 +158,7 @@ const ListOfCharacters: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([]); // Characters for the current page
-  const rowsPerPage = 8;
+  const rowsPerPage = 12;
 
   //To Fetch Characters
   const fetchCharacters = async (page: number) => {
@@ -129,7 +175,7 @@ const ListOfCharacters: React.FC = () => {
         family: normalizeFamilyName(character.family, character.fullName)
       }));
 
-      console.log(response.data,"fetched")
+      console.log(response.data, "fetched")
       setCharacters(formattedCharacters);
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
       setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
@@ -144,7 +190,6 @@ const ListOfCharacters: React.FC = () => {
 
   // Filter characters based on search input or by selecting Filter Checkbox
   const filterCharacters = () => {
-    debugger
     console.log(searchTerm, "ddd")
     const lowerCaseSearch = searchTerm.toLowerCase();
 
@@ -153,7 +198,6 @@ const ListOfCharacters: React.FC = () => {
       (selectedFamily === "All" ? uniqueFamilies : selectedFamily.includes(char.family))
     );
 
-    setSearchAndFilterCharacters(results);
     setTotalPages(Math.ceil(results.length / rowsPerPage));
     // setCurrentPage(1); // Reset to page 1 when filtering
     const startIndex = (1 - 1) * rowsPerPage;  // Start index for slicing
@@ -164,12 +208,18 @@ const ListOfCharacters: React.FC = () => {
   };
 
   // Get unique family names for the filter options
-  const uniqueFamilies = ["All",...Array.from(new Set( characterData.map((char) => char.family))),];
+  const uniqueFamilies = ["All", ...Array.from(new Set(characterData.map((char) => char.family))),];
 
   // ---------------------------------------------------------------------UseEffects---------------------------------------------------------------/
   //Trigger everyTime
   useEffect(() => {
-    fetchCharacters(currentPage);
+
+    const timeout = setTimeout(() => {
+      setShowWelcome(false); // Hide welcome message
+      fetchCharacters(currentPage);// Fetch data after animation
+    }, 6000);
+
+    return () => clearTimeout(timeout);
   }, [currentPage]);
 
   //Trigger when there is a change in dependency
@@ -231,158 +281,162 @@ const ListOfCharacters: React.FC = () => {
 
   const normalizeFamilyName = (family: string | null, fullName: string) => {
     if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
-  
+
     const cleanFamily = family.trim().toLowerCase(); // Trim spaces & lowercase everything
-  
-    
+
+
     const familyMappings: Record<string, string> = {
-    "House Stark": "House Stark",
-    "house stark": "House Stark",
-    "Stark": "House Stark",
-    "stark": "House Stark",
-  
-    "House Lannister": "House Lannister",
-    "house lannister": "House Lannister",
-    "Lannister": "House Lannister",
-    "lannister": "House Lannister",
-    "House Lanister": "Lannister",
-    
-  
-    "House Targaryen": "House Targaryen",
-    "Targaryan":"House Targaryen",
+      "House Stark": "House Stark",
+      "house stark": "House Stark",
+      "Stark": "House Stark",
+      "stark": "House Stark",
 
-    "Baratheon": "House Baratheon",
-    "House Baratheon": "House Baratheon",
+      "House Lannister": "House Lannister",
+      "house lannister": "House Lannister",
+      "Lannister": "House Lannister",
+      "lannister": "House Lannister",
+      "House Lanister": "Lannister",
 
-    "unknown": fullName,
-    "unkown": fullName, // Fix typo
-    "": fullName,
-    "none": fullName,
 
-    "Greyjoy": "House Greyjoy",
-    "House Greyjoy": "House Greyjoy"
+      "House Targaryen": "House Targaryen",
+      "Targaryan": "House Targaryen",
+
+      "Baratheon": "House Baratheon",
+      "House Baratheon": "House Baratheon",
+
+      "unknown": fullName,
+      "unkown": fullName, // Fix typo
+      "": fullName,
+      "none": fullName,
+
+      "Greyjoy": "House Greyjoy",
+      "House Greyjoy": "House Greyjoy"
 
 
     };
     console.log(familyMappings[cleanFamily], "UN")
-  
-    return familyMappings[cleanFamily] || family 
+
+    return familyMappings[cleanFamily] || family
   };
-  
 
   return (
     <ThemeProvider theme={theme}>
       <div className='backgroundColor' style={{ position: "relative", minHeight: "90vh" }}>
-        
-              {/* Background Image */}
-              <video
-                autoPlay
-                loop
-                muted
-                style={{
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  width: "100vw",  // Cover the entire viewport width
-                  height: "100vh", // Cover the entire viewport height
-                  objectFit: "cover", // Make sure the video fills the screen
-                  // transform: "rotate(-90deg)", // Rotate the video horizontally
-                  transformOrigin: "center", // Center the rotation
-                  zIndex: -1, // Make sure video stays in the background
-                }}
-              >
-                <source src={GOT} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-        <div style={{ marginBottom: '5px' }}>
-          <img src={logoOne} alt="Game Of Thrones App" style={imageStyle} />
-        </div>
-        <Box className='searchBarBox' sx={{ background: 'linear-gradient(90deg, rgb(169 140 140 / 23%) 0%, rgb(219 219 195 / 26%) 100%)' }}>
-          <TextField className='searchBarTextField'
-            label="Search Family / Character"
-            variant="outlined"
-            value={searchTerm}
-            onChange={handleSearchData}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <img src={Searchgif} alt="Search" style={{ width: '30px', height: '30px' }} />
-                </InputAdornment>
-              )
-            }}
-          />
-          {!showFilters ?
-            <FilterListIcon onClick={() => setShowFilters(!showFilters)} style={{color:'white'}}/>
-            :
-            <select
-            value={selectedFamily}
-            onChange={(e) => setSelectedFamily(e.target.value)}
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              fontSize: "16px",
-              cursor: "pointer",
-              border: "1px solid #ccc",
-            }}
-          >
-            {uniqueFamilies.map((family) => (
-              <option key={family} value={family}>
-                {family}
-              </option>
-            ))}
-          </select>
-          }
-        </Box>
-        <Box className="character-grid">
-          {loading ? (
-            <div>
-              <img src={"ttt"} alt="Loading..." style={{ maxWidth: '100%', height: 'auto' }} />
-            </div>
-          ) : (
-            paginatedCharacters.map((character, index) => {
-              return (
-                <div key={index} className="character-item">
-                  <Box display="grid" gridTemplateColumns="repeat(1, 1fr)" gap={2}>
-                    <CharacterCard>
-                      <CardContentStyled>
-                        <ImageContainer>
-                          <img src={character.imageUrl} alt={character.name} style={{ width: '100%', height: '100%' }} />
-                        </ImageContainer>
-                        <Typography variant="h6" component="div" sx={{ marginTop: '8px' }}>
-                          {character.name}
-                        </Typography>
-                      </CardContentStyled>
 
-                      {/* making id and more Button in same line */}
-                      <CardActions>
-                        <Box className='idButton'>
-                          <Typography sx={{ marginTop: '10px' }}>#{character.id}</Typography>
-                          <Tooltip title="More Details">
-                            <IconButton onClick={() => handleRedirect(character.id)}>
-                              <MoreHorizIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </CardActions>
-                    </CharacterCard>
-                  </Box>
+        {/* Background Image */}
+        <video autoPlay loop muted
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100vw",  // Cover the entire viewport width
+            height: "135vh", // Cover the entire viewport height
+            objectFit: "cover", // Make sure the video fills the screen
+            transformOrigin: "center", // Center the rotation
+            zIndex: -1, // Make sure video stays in the background
+          }}
+        >
+          <source src={GOT} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {showWelcome && (
+          <div style={welcomeScreenStyle}>
+            <h1 style={welcomeTextStyle}>When you play game of thrones, you win or you die. There is no middle ground!.</h1>
+          </div>
+        )}
+        {!showWelcome && (
+          <div>
+            <div style={{ marginBottom: '5px' }}>
+              <img src={logoOne} alt="Game Of Thrones App" style={imageStyle} />
+            </div>
+            <Box className='searchBarBox' sx={{ background: 'linear-gradient(90deg, rgb(169 140 140 / 23%) 0%, rgb(219 219 195 / 26%) 100%)' }}>
+              <TextField className='searchBarTextField'
+                label="Search Family / Character"
+                variant="outlined"
+                value={searchTerm}
+                onChange={handleSearchData}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <img src={Searchgif} alt="Search" style={{ width: '30px', height: '30px' }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+              {!showFilters ?
+                <FilterListIcon onClick={() => setShowFilters(!showFilters)} style={{ color: 'white' }} />
+                :
+                <select
+                  value={selectedFamily}
+                  onChange={(e) => setSelectedFamily(e.target.value)}
+                  style={{
+                    padding: "10px",
+                    borderRadius: "8px",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  {uniqueFamilies.map((family) => (
+                    <option key={family} value={family}>
+                      {family}
+                    </option>
+                  ))}
+                </select>
+              }
+            </Box>
+            <Box className="character-grid">
+              {loading ? (
+                <div>
+                  <img src={"ttt"} alt="Loading..." style={{ maxWidth: '100%', height: 'auto' }} />
                 </div>
-              );
-            })
-          )}
-        </Box>
-        <PaginationContainer>
-          <Button variant="contained" onClick={() => handleNext} disabled={currentPage === 1}>
-            Previous
-          </Button>
-          <Box display="flex" alignItems="center" gap="8px">
-            {paginationButtons}
-          </Box>
-          <Button variant="contained" onClick={() => handlePrevious} disabled={currentPage === totalPages}>
-            Next
-          </Button>
-        </PaginationContainer>
-        {/* <ScrollToTopButton /> */}
+              ) : (
+                paginatedCharacters.map((character, index) => {
+                  return (
+                    <div key={index} className="character-item">
+                      <Box display="grid" gridTemplateColumns="repeat(1, 1fr)" gap={2}>
+                        <CharacterCard>
+                          <CardContentStyled>
+                            <ImageContainer>
+                              <img src={character.imageUrl} alt={character.name} style={{ width: '100%', height: '100%' }} />
+                            </ImageContainer>
+                            <Typography variant="h6" component="div" sx={{ marginTop: '8px' }}>
+                              {character.name}
+                            </Typography>
+                          </CardContentStyled>
+
+                          {/* making id and more Button in same line */}
+                          <CardActions>
+                            <Box className='idButton'>
+                              <Typography sx={{ marginTop: '10px' }}>#{character.id}</Typography>
+                              <Tooltip title="More Details">
+                                <IconButton onClick={() => handleRedirect(character.id)}>
+                                  <MoreHorizIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </CardActions>
+                        </CharacterCard>
+                      </Box>
+                    </div>
+                  );
+                })
+              )}
+            </Box>
+            <PaginationContainer>
+              <Button variant="contained" onClick={() => handleNext} disabled={currentPage === 1}>
+                Previous
+              </Button>
+              <Box display="flex" alignItems="center" gap="8px">
+                {paginationButtons}
+              </Box>
+              <Button variant="contained" onClick={() => handlePrevious} disabled={currentPage === totalPages}>
+                Next
+              </Button>
+            </PaginationContainer>
+            <ScrollToTopButton />
+          </div>
+        )}
       </div>
     </ThemeProvider>
   );
