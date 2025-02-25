@@ -11,23 +11,32 @@ import {
   styled,
   ThemeProvider,
   createTheme,
-  IconButton
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
-import logo from '../../assets/images/logo.jpg';
+import logoOne from '../../assets/images/logoOne.jpg';
 import Tooltip from '@mui/material/Tooltip';
 import { useNavigate } from 'react-router-dom';
 
 //import image
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Throne from '../../assets/images/throne.mp4';
+import Searchgif from '../../assets/images/searchGif.gif';
+import GOT from '../../assets/images/GOT.mp4';
 
 //import CSS
 import './ListOfCharacters.css'
+
+//import icons
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ScrollToTopButton from '../ScrollToTop/ScrollToTop';
 
 // Define the types for your data
 interface Character {
   name: string;
   imageUrl: string;
   house: string;
+  family: string;
   id: number
 }
 
@@ -86,22 +95,26 @@ const ListOfCharacters: React.FC = () => {
   const imageStyle: React.CSSProperties = {
     display: 'block',
     margin: '0 auto',
-    height: '154px',
+    height: '60px',
     width: 'auto'
   };
 
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [searchAndFilterCharacters, setSearchAndFilterCharacters] = useState<Character[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedFamily, setSelectedFamily] = useState<string>("All");
 
   //Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([]); // Characters for the current page
-  const rowsPerPage = 12;
+  const rowsPerPage = 8;
 
+  //To Fetch Characters
   const fetchCharacters = async (page: number) => {
     try {
       setLoading(true)
@@ -111,10 +124,12 @@ const ListOfCharacters: React.FC = () => {
       const formattedCharacters = response.data.map((character: any) => ({
         name: character.fullName,
         imageUrl: character.imageUrl,
-        house: character.house ? character.house.name : "Unknown",
-        id: character.id ? character.id : 0
+        house: character.house ? character.house.name : character.fullName,
+        id: character.id ? character.id : 0,
+        family: normalizeFamilyName(character.family, character.fullName)
       }));
 
+      console.log(response.data,"fetched")
       setCharacters(formattedCharacters);
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
       setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
@@ -127,21 +142,50 @@ const ListOfCharacters: React.FC = () => {
   };
 
 
+  // Filter characters based on search input or by selecting Filter Checkbox
+  const filterCharacters = () => {
+    debugger
+    console.log(searchTerm, "ddd")
+    const lowerCaseSearch = searchTerm.toLowerCase();
+
+    const results = characterData.filter((char) =>
+      (char.name.toLowerCase().includes(lowerCaseSearch) || char.family.toLowerCase().includes(lowerCaseSearch)) &&
+      (selectedFamily === "All" ? uniqueFamilies : selectedFamily.includes(char.family))
+    );
+
+    setSearchAndFilterCharacters(results);
+    setTotalPages(Math.ceil(results.length / rowsPerPage));
+    // setCurrentPage(1); // Reset to page 1 when filtering
+    const startIndex = (1 - 1) * rowsPerPage;  // Start index for slicing
+    const endIndex = startIndex + rowsPerPage;  // End index for slicing
+
+    setPaginatedCharacters(results.slice(startIndex, endIndex));
+
+  };
+
+  // Get unique family names for the filter options
+  const uniqueFamilies = ["All",...Array.from(new Set( characterData.map((char) => char.family))),];
+
+  // ---------------------------------------------------------------------UseEffects---------------------------------------------------------------/
+  //Trigger everyTime
   useEffect(() => {
     fetchCharacters(currentPage);
-  }, []);
+  }, [currentPage]);
 
+  //Trigger when there is a change in dependency
+  useEffect(() => {
+    filterCharacters();
+  }, [searchTerm, selectedFamily]);
+
+  //Trigger when there is a change in dependency
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
     const endIndex = startIndex + rowsPerPage;  // End index for slicing
 
-    setPaginatedCharacters(characterData.slice(startIndex, endIndex)); // Slice the correct page data
+    setPaginatedCharacters(characterData.slice(startIndex, endIndex));
   }, [currentPage, characterData]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
+  // Pagination
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
@@ -175,23 +219,119 @@ const ListOfCharacters: React.FC = () => {
     }
   };
 
+  // Redirecting to Details Page
   const handleRedirect = (characterId: number) => {
     navigate(`/characters/${characterId}`);
   };
 
+
+  const handleSearchData = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setSearchTerm(event?.target.value)
+  }
+
+  const normalizeFamilyName = (family: string | null, fullName: string) => {
+    if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
+  
+    const cleanFamily = family.trim().toLowerCase(); // Trim spaces & lowercase everything
+  
+    
+    const familyMappings: Record<string, string> = {
+    "House Stark": "House Stark",
+    "house stark": "House Stark",
+    "Stark": "House Stark",
+    "stark": "House Stark",
+  
+    "House Lannister": "House Lannister",
+    "house lannister": "House Lannister",
+    "Lannister": "House Lannister",
+    "lannister": "House Lannister",
+    "House Lanister": "Lannister",
+    
+  
+    "House Targaryen": "House Targaryen",
+    "Targaryan":"House Targaryen",
+
+    "Baratheon": "House Baratheon",
+    "House Baratheon": "House Baratheon",
+
+    "unknown": fullName,
+    "unkown": fullName, // Fix typo
+    "": fullName,
+    "none": fullName,
+
+    "Greyjoy": "House Greyjoy",
+    "House Greyjoy": "House Greyjoy"
+
+
+    };
+    console.log(familyMappings[cleanFamily], "UN")
+  
+    return familyMappings[cleanFamily] || family 
+  };
+  
+
   return (
     <ThemeProvider theme={theme}>
-      <div className='backgroundColor'>
+      <div className='backgroundColor' style={{ position: "relative", minHeight: "90vh" }}>
+        
+              {/* Background Image */}
+              <video
+                autoPlay
+                loop
+                muted
+                style={{
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  width: "100vw",  // Cover the entire viewport width
+                  height: "100vh", // Cover the entire viewport height
+                  objectFit: "cover", // Make sure the video fills the screen
+                  // transform: "rotate(-90deg)", // Rotate the video horizontally
+                  transformOrigin: "center", // Center the rotation
+                  zIndex: -1, // Make sure video stays in the background
+                }}
+              >
+                <source src={GOT} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
         <div style={{ marginBottom: '5px' }}>
-          <img src={logo} alt="Game Of Thrones App" style={imageStyle} />
+          <img src={logoOne} alt="Game Of Thrones App" style={imageStyle} />
         </div>
         <Box className='searchBarBox' sx={{ background: 'linear-gradient(90deg, rgb(169 140 140 / 23%) 0%, rgb(219 219 195 / 26%) 100%)' }}>
           <TextField className='searchBarTextField'
             label="Search Family / Character"
             variant="outlined"
             value={searchTerm}
-            onChange={handleSearchChange}
+            onChange={handleSearchData}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <img src={Searchgif} alt="Search" style={{ width: '30px', height: '30px' }} />
+                </InputAdornment>
+              )
+            }}
           />
+          {!showFilters ?
+            <FilterListIcon onClick={() => setShowFilters(!showFilters)} style={{color:'white'}}/>
+            :
+            <select
+            value={selectedFamily}
+            onChange={(e) => setSelectedFamily(e.target.value)}
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              fontSize: "16px",
+              cursor: "pointer",
+              border: "1px solid #ccc",
+            }}
+          >
+            {uniqueFamilies.map((family) => (
+              <option key={family} value={family}>
+                {family}
+              </option>
+            ))}
+          </select>
+          }
         </Box>
         <Box className="character-grid">
           {loading ? (
@@ -242,6 +382,7 @@ const ListOfCharacters: React.FC = () => {
             Next
           </Button>
         </PaginationContainer>
+        {/* <ScrollToTopButton /> */}
       </div>
     </ThemeProvider>
   );
