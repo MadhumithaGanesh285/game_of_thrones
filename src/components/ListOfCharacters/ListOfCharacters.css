@@ -1,5 +1,21 @@
+@font-face {
+  font-family: 'GameOfThrones';
+  src: url('fonts/GameOfThrones.woff2') format('woff2'),
+       url('fonts/GameOfThrones.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.got-text {
+  font-family: 'GameOfThrones', serif;
+  font-size: 48px;
+  color: silver;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
 .backgroundColor {
-    background-color: rgba(25, 118, 210, 0.04);
     padding: 20px;
     max-width: 2000px;
     margin: 0 auto;

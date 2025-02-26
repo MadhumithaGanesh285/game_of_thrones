@@ -3,7 +3,6 @@ import axios from 'axios';
 import {
   Card,
   CardContent,
-  CardActions,
   Button,
   TextField,
   Typography,
@@ -11,23 +10,15 @@ import {
   styled,
   ThemeProvider,
   createTheme,
-  IconButton,
-  InputAdornment,
+  Autocomplete,
 } from '@mui/material';
-import logoOne from '../../assets/images/logoOne.jpg';
-import Tooltip from '@mui/material/Tooltip';
-import { useNavigate } from 'react-router-dom';
-
-//import image
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import Searchgif from '../../assets/images/searchGif.gif';
-import GOT from '../../assets/images/GOT.mp4';
-
+import { Link } from 'react-router-dom';
+import ThroneThree from '../../assets/images/ThroneThree.jpg'
+import { lighten, darken } from '@mui/system';
 //import CSS
 import './ListOfCharacters.css'
 
 //import icons
-import FilterListIcon from '@mui/icons-material/FilterList';
 import ScrollToTopButton from '../ScrollToTop/ScrollToTop';
 
 // Define the types for your data
@@ -51,6 +42,7 @@ const CharacterCard = styled(Card)(({ theme }) => ({
   maxWidth: '250px',
   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
   background: theme.palette.background.paper,
+  backgroundColor: '#679a9f59',
   borderColor: '#c8c8c8',
   transition: 'transform 0.3s, box-shadow 0.3s',
   '&:hover': {
@@ -65,18 +57,20 @@ const CardContentStyled = styled(CardContent)({
   flexDirection: 'column',
   alignItems: 'center',
   textAlign: 'center',
+  padding: '0px',
 });
 
 // New style for the image container with dynamic color in round shape
 const ImageContainer = styled(Box)({
-  width: '120px',
-  height: '120px',
-  borderRadius: '50%',
+  width: '250px',
+  height: '300px',
+  // borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: '8px',
   overflow: 'hidden',
+  padding: '0px',
 });
 
 //proper alignment to page number button
@@ -90,13 +84,6 @@ const PaginationContainer = styled(Box)({
 });
 
 const ListOfCharacters: React.FC = () => {
-
-  const imageStyle: React.CSSProperties = {
-    display: 'block',
-    margin: '0 auto',
-    height: '60px',
-    width: 'auto'
-  };
 
   const welcomeScreenStyle: React.CSSProperties = {
     position: "fixed",
@@ -112,6 +99,7 @@ const ListOfCharacters: React.FC = () => {
     fontSize: "2rem",
     zIndex: 9999,
     animation: "fadeOut 1s ease-in-out 2.5s forwards",
+    backgroundColor: 'black'
   };
 
   const welcomeTextStyle: React.CSSProperties = {
@@ -145,14 +133,25 @@ const ListOfCharacters: React.FC = () => {
     }
   `, styleSheet.cssRules.length);
 
-  const navigate = useNavigate();
+  const GroupHeader = styled('div')(({ theme }) => ({
+    position: 'sticky',
+    top: '-8px',
+    padding: '4px 10px',
+    color: theme.palette.primary.main,
+    backgroundColor: lighten(theme.palette.primary.light, 0.85),
+    ...theme.applyStyles('dark', {
+      backgroundColor: darken(theme.palette.primary.main, 0.8),
+    }),
+  }));
+
+  const GroupItems = styled('ul')({
+    padding: 0,
+  });
 
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showWelcome, setShowWelcome] = useState(true); // New state for animation
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedFamily, setSelectedFamily] = useState<string>("All");
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
 
   //Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -168,14 +167,14 @@ const ListOfCharacters: React.FC = () => {
 
       // Map character data to include names and image URLs
       const formattedCharacters = response.data.map((character: any) => ({
-        name: character.fullName,
+        name: character.fullName.replace(/fullName/i, '').trim(),
         imageUrl: character.imageUrl,
         house: character.house ? character.house.name : character.fullName,
         id: character.id ? character.id : 0,
-        family: normalizeFamilyName(character.family, character.fullName)
+        family: character.family
       }));
 
-      console.log(response.data, "fetched")
+      console.log(response.data, formattedCharacters, "fetched")
       setCharacters(formattedCharacters);
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
       setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
@@ -188,27 +187,32 @@ const ListOfCharacters: React.FC = () => {
   };
 
 
-  // Filter characters based on search input or by selecting Filter Checkbox
-  const filterCharacters = () => {
-    console.log(searchTerm, "ddd")
-    const lowerCaseSearch = searchTerm.toLowerCase();
+  const filterSearchPagination = (searchValue: string) => {
+    const sortedFilteredData = characterData
+      .filter((character) =>
+        character.name.toLowerCase().includes(searchValue) ||
+        character.family.toLowerCase().includes(searchValue)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name)); // Sorting by name, you can modify this sorting as needed
+    const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
+    const endIndex = 1 + rowsPerPage;  // End index for slicing
+    setTotalPages(Math.ceil(sortedFilteredData.length / rowsPerPage));
+    console.log(startIndex, endIndex, "1")
+    setPaginatedCharacters(sortedFilteredData.slice(startIndex, endIndex));
+  }
 
-    const results = characterData.filter((char) =>
-      (char.name.toLowerCase().includes(lowerCaseSearch) || char.family.toLowerCase().includes(lowerCaseSearch)) &&
-      (selectedFamily === "All" ? uniqueFamilies : selectedFamily.includes(char.family))
-    );
-
-    setTotalPages(Math.ceil(results.length / rowsPerPage));
-    // setCurrentPage(1); // Reset to page 1 when filtering
-    const startIndex = (1 - 1) * rowsPerPage;  // Start index for slicing
-    const endIndex = startIndex + rowsPerPage;  // End index for slicing
-
-    setPaginatedCharacters(results.slice(startIndex, endIndex));
-
+  const handleSearchFilterChange = (event: React.SyntheticEvent, newValue: Character | null) => {
+    setSelectedCharacter(newValue);
+    // Apply dynamic filtering and sorting
+    const searchValue = newValue ? newValue.name.toLowerCase() : '';
+    filterSearchPagination(searchValue)
   };
 
-  // Get unique family names for the filter options
-  const uniqueFamilies = ["All", ...Array.from(new Set(characterData.map((char) => char.family))),];
+  const handleInputChange = (event: React.SyntheticEvent, value: string) => {
+    // Apply filtering and sorting as the user types
+    const searchValue = value.toLowerCase();
+    filterSearchPagination(searchValue)
+  };
 
   // ---------------------------------------------------------------------UseEffects---------------------------------------------------------------/
   //Trigger everyTime
@@ -221,11 +225,6 @@ const ListOfCharacters: React.FC = () => {
 
     return () => clearTimeout(timeout);
   }, [currentPage]);
-
-  //Trigger when there is a change in dependency
-  useEffect(() => {
-    filterCharacters();
-  }, [searchTerm, selectedFamily]);
 
   //Trigger when there is a change in dependency
   useEffect(() => {
@@ -256,89 +255,78 @@ const ListOfCharacters: React.FC = () => {
     );
   }
 
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(prev => prev + 1);
-    }
-  };
-
-  // Handle "Previous" button click
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage(prev => prev - 1);
-    }
-  };
-
-  // Redirecting to Details Page
-  const handleRedirect = (characterId: number) => {
-    navigate(`/characters/${characterId}`);
-  };
-
-
-  const handleSearchData = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setSearchTerm(event?.target.value)
-  }
-
-  const normalizeFamilyName = (family: string | null, fullName: string) => {
-    if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
-
-    const cleanFamily = family.trim().toLowerCase(); // Trim spaces & lowercase everything
-
-
-    const familyMappings: Record<string, string> = {
-      "House Stark": "House Stark",
-      "house stark": "House Stark",
-      "Stark": "House Stark",
-      "stark": "House Stark",
-
-      "House Lannister": "House Lannister",
-      "house lannister": "House Lannister",
-      "Lannister": "House Lannister",
-      "lannister": "House Lannister",
-      "House Lanister": "Lannister",
-
-
-      "House Targaryen": "House Targaryen",
-      "Targaryan": "House Targaryen",
-
-      "Baratheon": "House Baratheon",
-      "House Baratheon": "House Baratheon",
-
-      "unknown": fullName,
-      "unkown": fullName, // Fix typo
-      "": fullName,
-      "none": fullName,
-
-      "Greyjoy": "House Greyjoy",
-      "House Greyjoy": "House Greyjoy"
-
-
-    };
-    console.log(familyMappings[cleanFamily], "UN")
-
-    return familyMappings[cleanFamily] || family
-  };
-
   return (
     <ThemeProvider theme={theme}>
-      <div className='backgroundColor' style={{ position: "relative", minHeight: "90vh" }}>
-
-        {/* Background Image */}
-        <video autoPlay loop muted
+      <div className='backgroundColor' style={{ display: "flex", width: "100vw", height: "90vh" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 20px' }}>
+          <h1 className="got-text" style={{ margin: 0 }}>Game Of Thrones</h1>
+          <div style={{ flex: 1, paddingRight: 5 }}></div>
+          <div style={{ marginRight: '70px' }}>
+            <Autocomplete
+              disablePortal
+              options={[...characterData] // Make a copy of the array to avoid mutating state
+                .map((char) => ({
+                  ...char,
+                  family: `House ${char.family.replace(/house /i, '').trim()}`, // Normalize family names
+                  fullName: `FullName ${char.name.replace(/FullName/i, '').trim()}`,
+                }))
+                .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
+                .filter((value, index, self) => // Remove duplicate names based on `name` or `fullName`
+                index === self.findIndex((t) => t.name === value.name))
+              }
+              getOptionLabel={(option) => option.name}
+              value={selectedCharacter}
+              onChange={handleSearchFilterChange}
+              onInputChange={handleInputChange}
+              filterOptions={(options, state) => {
+                const searchValue = state.inputValue.toLowerCase();
+                return options.filter(
+                  (option) =>
+                    option.name.toLowerCase().includes(searchValue) ||
+                    option.family.toLowerCase().includes(searchValue)
+                );
+              }}
+              sx={{ width: 300, backgroundColor: 'white' }}
+              groupBy={(option) => option.family} // Now properly sorted, avoiding duplicates
+              renderInput={(params) => <TextField {...params} label="Family / Character" 
+              sx={{
+                '& .MuiInputLabel-root': {
+                  fontWeight:'bold',
+                  backgroundColor:'white'
+                },
+                '& .MuiOutlinedInput-root': {
+                  color: 'green' // Change the text color inside the input to green
+                }
+              }}
+              />}
+              renderGroup={(params) => (
+                <li key={params.key}>
+                  <GroupHeader>{params.group}</GroupHeader>
+                  <GroupItems style={{ listStyleType: 'none', padding: 0 }}>{params.children}</GroupItems>
+                </li>
+              )}
+            />
+          </div>
+        </div>
+        <div
           style={{
             position: "absolute",
-            top: "0",
-            left: "0",
-            width: "100vw",  // Cover the entire viewport width
-            height: "135vh", // Cover the entire viewport height
-            objectFit: "cover", // Make sure the video fills the screen
-            transformOrigin: "center", // Center the rotation
-            zIndex: -1, // Make sure video stays in the background
+            flex: "2.5",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${ThroneThree})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: "cover",  // Ensures image covers the area without distortion
+            backgroundPosition: 'center',
+            backgroundAttachment: "fixed",  // Optional: Keeps background fixed when scrolling
+            filter: "brightness(100%)",  // Optional: Darken background image for better readability
+            zIndex: -2,
+            // objectFit: "cover",  // Ensures the background image is fully covered without distortion
+            height: '160vh',
           }}
-        >
-          <source src={GOT} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        ></div>
         {showWelcome && (
           <div style={welcomeScreenStyle}>
             <h1 style={welcomeTextStyle}>When you play game of thrones, you win or you die. There is no middle ground!.</h1>
@@ -346,45 +334,6 @@ const ListOfCharacters: React.FC = () => {
         )}
         {!showWelcome && (
           <div>
-            <div style={{ marginBottom: '5px' }}>
-              <img src={logoOne} alt="Game Of Thrones App" style={imageStyle} />
-            </div>
-            <Box className='searchBarBox' sx={{ background: 'linear-gradient(90deg, rgb(169 140 140 / 23%) 0%, rgb(219 219 195 / 26%) 100%)' }}>
-              <TextField className='searchBarTextField'
-                label="Search Family / Character"
-                variant="outlined"
-                value={searchTerm}
-                onChange={handleSearchData}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <img src={Searchgif} alt="Search" style={{ width: '30px', height: '30px' }} />
-                    </InputAdornment>
-                  )
-                }}
-              />
-              {!showFilters ?
-                <FilterListIcon onClick={() => setShowFilters(!showFilters)} style={{ color: 'white' }} />
-                :
-                <select
-                  value={selectedFamily}
-                  onChange={(e) => setSelectedFamily(e.target.value)}
-                  style={{
-                    padding: "10px",
-                    borderRadius: "8px",
-                    fontSize: "16px",
-                    cursor: "pointer",
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  {uniqueFamilies.map((family) => (
-                    <option key={family} value={family}>
-                      {family}
-                    </option>
-                  ))}
-                </select>
-              }
-            </Box>
             <Box className="character-grid">
               {loading ? (
                 <div>
@@ -394,43 +343,33 @@ const ListOfCharacters: React.FC = () => {
                 paginatedCharacters.map((character, index) => {
                   return (
                     <div key={index} className="character-item">
-                      <Box display="grid" gridTemplateColumns="repeat(1, 1fr)" gap={2}>
-                        <CharacterCard>
-                          <CardContentStyled>
-                            <ImageContainer>
-                              <img src={character.imageUrl} alt={character.name} style={{ width: '100%', height: '100%' }} />
-                            </ImageContainer>
-                            <Typography variant="h6" component="div" sx={{ marginTop: '8px' }}>
-                              {character.name}
-                            </Typography>
-                          </CardContentStyled>
-
-                          {/* making id and more Button in same line */}
-                          <CardActions>
-                            <Box className='idButton'>
-                              <Typography sx={{ marginTop: '10px' }}>#{character.id}</Typography>
-                              <Tooltip title="More Details">
-                                <IconButton onClick={() => handleRedirect(character.id)}>
-                                  <MoreHorizIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          </CardActions>
-                        </CharacterCard>
-                      </Box>
+                      <Link to={`/Characters/${character.id}`} style={{ textDecoration: 'none' }}>
+                        <Box display="grid" gridTemplateColumns="repeat(1, 1fr)" gap={2}>
+                          <CharacterCard>
+                            <CardContentStyled>
+                              <ImageContainer>
+                                <img src={character.imageUrl} alt={character.name} style={{ width: '100%', height: '100%' }} />
+                              </ImageContainer>
+                              <Typography variant="h5" component="div" sx={{ marginTop: '8px', color: 'white' }}>
+                                {character.name}
+                              </Typography>
+                            </CardContentStyled>
+                          </CharacterCard>
+                        </Box>
+                      </Link>
                     </div>
                   );
                 })
               )}
             </Box>
             <PaginationContainer>
-              <Button variant="contained" onClick={() => handleNext} disabled={currentPage === 1}>
+              <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                 Previous
               </Button>
               <Box display="flex" alignItems="center" gap="8px">
                 {paginationButtons}
               </Box>
-              <Button variant="contained" onClick={() => handlePrevious} disabled={currentPage === totalPages}>
+              <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
                 Next
               </Button>
             </PaginationContainer>
