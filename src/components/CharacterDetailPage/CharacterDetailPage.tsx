@@ -25,6 +25,7 @@ const CharacterDetails: React.FC = () => {
       .get<Character[]>("https://thronesapi.com/api/v2/Characters")
       .then((response) => {
         const allCharacters = response.data;
+        
         const selectedChar = allCharacters.find((char) => char.id.toString() === id);
 
         if (selectedChar) {
@@ -34,12 +35,12 @@ const CharacterDetails: React.FC = () => {
           // Find characters with the same last name (excluding current character)
           const filteredChars = allCharacters.map((char) => ({
             ...char,
-            family: `House ${char.family.replace(/house /i, '').trim()}`, // Normalize family name
+            family: normalizeFamilyName(char.family, char.fullName), // Normalize family name
           }))
-          .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
-          .filter(
-            (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase())
-          );
+            .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
+            .filter(
+              (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase())
+            );
 
           setRelatedCharacters(filteredChars);
         }
@@ -49,41 +50,45 @@ const CharacterDetails: React.FC = () => {
 
   const normalizeFamilyName = (family: string | null, fullName: string) => {
     if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
-  
+
     const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
-    
+
     const familyMappings: Record<string, string> = {
-    "Stark": "House Stark",
-    "stark": "House Stark",
-  
-    "Lannister": "House Lannister",
-    "lannister": "House Lannister",
-    "Lanister": "House Lannister",
-    "lanister": "House Lannister",
+      "Stark": "House Stark",
+      "stark": "House Stark",
 
-    "targaryan":"House Targaryen",
-    "targaryen":"House Targaryen",
+      "Lannister": "House Lannister",
+      "lannister": "House Lannister",
+      "Lanister": "House Lannister",
+      "lanister": "House Lannister",
+      "House Lanister":"House Lannister",
+      "House Lannister": "lanister",
 
-    "Baratheon": "House Baratheon",
+      "targaryan": "House Targaryen",
+      "targaryen": "House Targaryen",
 
-    "unknown": fullName,
-    "unkown": fullName, // Fix typo
-    "": fullName,
-    "none": fullName,
+      "Baratheon": "House Baratheon",
 
-    "Greyjoy": "House Greyjoy",
+      "unknown": fullName,
+      "unkown": fullName, // Fix typo
+      "": fullName,
+      "none": fullName,
 
-    "bolton": "House Bolton"
+      "bolton": "House Bolton",
+
+      "Greyjoy": "House Greyjoy",
+      "greyjoy": "House Greyjoy"
 
     };
-  
-    return familyMappings[cleanFamily] || family 
+
+    return familyMappings[cleanFamily] || family
   };
 
   if (!character) return <h2>Loading...</h2>;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "95vh", padding: "20px", backgroundColor: 'rgb(241, 247, 252)' }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "95vh", padding: "20px" }}>
+      
       {/* Main Card */}
       <div
         style={{
@@ -95,11 +100,34 @@ const CharacterDetails: React.FC = () => {
           backgroundColor: "#fff",
         }}
       >
-        {/* Main Character Card */}
+         {/* Go Back Button (Outside the Card) */}
+      <Button
+        onClick={() => navigate("/")}
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          fontSize: "16px",
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <FaArrowLeft /> Go Back
+      </Button>
+        {/* Character Name (Centered & Bold) Inside Card */}
+        <h2 style={{ textAlign: "center", fontWeight: "bold", padding: "15px 0", borderBottom: "2px solid #ddd" }}>
+          {character.fullName}
+        </h2>
+
+        {/* Character Details Section */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: "30px",
             padding: "20px",
             borderRadius: "10px",
@@ -108,33 +136,32 @@ const CharacterDetails: React.FC = () => {
           }}
         >
           {/* Left: Character Details */}
-          <div style={{ textAlign: "left", flex: 1 }}>
-            <h2>First Name: {character.firstName}</h2>
-            <h2>Last Name: {character.lastName}</h2>
-            <h2>Full Name: {character.fullName}</h2>
-            <h3>Title: {character.title}</h3>
-            <h3>Family: {character.family}</h3>
+          <div style={{ textAlign: "left", flex: 1, fontWeight:'bold' }}>
+            <p>First Name: {character.firstName}</p>
+            <p>Last Name: {character.lastName}</p>
+            <p>Full Name: {character.fullName}</p>
+            <p>Title: {character.title}</p>
+            <p>Family: {character.family}</p>
           </div>
 
           {/* Right: Character Image */}
           <img
             src={character.imageUrl}
             alt={character.fullName}
-            style={{ width: "200px", borderRadius: "10px", objectFit: "cover" }}
+            style={{ width: "200px", borderRadius: "10px", objectFit: "cover", height:'270px' }}
           />
         </div>
 
-        {/* Header Section: Count Button - Title - Refresh */}
+        {/* Related Family Members Header */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            marginTop: "30px",
+            marginTop: "20px",
             padding: "0 20px",
           }}
         >
-
           {/* Refresh Button (Right) */}
           <button
             onClick={() => window.location.reload()} // Change this function as needed
@@ -153,7 +180,7 @@ const CharacterDetails: React.FC = () => {
           </button>
           {/* Centered Title */}
           <h3 style={{ flex: 1, textAlign: "center" }}>Related Family Members: "{character.family}"</h3>
-          {/* Count Button (Left) */}
+          {/* Refresh Button (Right) */}
           <button
             disabled
             style={{
@@ -168,7 +195,6 @@ const CharacterDetails: React.FC = () => {
           >
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}
           </button>
-
         </div>
 
         {/* Related Characters */}
@@ -208,24 +234,6 @@ const CharacterDetails: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Go Back Button (Outside the Card) */}
-      <Button
-        onClick={() => navigate("/")}
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-        }}
-      >
-        <FaArrowLeft /> Go Back
-      </Button>
     </div>
   );
 };

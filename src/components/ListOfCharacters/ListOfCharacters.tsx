@@ -62,7 +62,7 @@ const CardContentStyled = styled(CardContent)({
 // New style for the image container with dynamic color in round shape
 const ImageContainer = styled(Box)({
   width: '250px',
-  height: '300px',
+  height: '266px',
   // borderRadius: '50%',
   display: 'flex',
   alignItems: 'center',
@@ -152,6 +152,7 @@ const ListOfCharacters: React.FC = () => {
       setLoading(true)
       const response = await axios.get(`https://thronesapi.com/api/v2/Characters`);
 
+      console.log(response.data, "see original data")
       // Map character data to include names and image URLs
       const formattedCharacters = response.data.map((character: any) => ({
         name: character.fullName.replace(/fullName/i, '').trim(),
@@ -160,6 +161,7 @@ const ListOfCharacters: React.FC = () => {
         id: character.id ? character.id : 0,
         family: normalizeFamilyName(character.family, character.fullName)
       }));
+      console.log(formattedCharacters, "see formatted data")
       setCharacters(formattedCharacters);
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
       setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
@@ -195,9 +197,10 @@ const ListOfCharacters: React.FC = () => {
     "": fullName,
     "none": fullName,
 
-    "Greyjoy": "House Greyjoy",
+    "bolton": "House Bolton",
 
-    "bolton": "House Bolton"
+    "Greyjoy": "House Greyjoy",
+    "greyjoy": "House Greyjoy"
 
     };
   
