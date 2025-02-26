@@ -32,7 +32,12 @@ const CharacterDetails: React.FC = () => {
           const familyName = selectedChar.family
 
           // Find characters with the same last name (excluding current character)
-          const filteredChars = allCharacters.filter(
+          const filteredChars = allCharacters.map((char) => ({
+            ...char,
+            family: `House ${char.family.replace(/house /i, '').trim()}`, // Normalize family name
+          }))
+          .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
+          .filter(
             (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase())
           );
 
@@ -160,7 +165,7 @@ const CharacterDetails: React.FC = () => {
                 <img
                   src={char.imageUrl}
                   alt={char.fullName}
-                  style={{ width: "100%", borderRadius: "10px", objectFit: "cover" }}
+                  style={{ width: "100%", height:'80%', borderRadius: "10px", objectFit: "cover" }}
                 />
                 <h4 style={{ marginTop: "10px" }}>{char.fullName}</h4>
               </div>
