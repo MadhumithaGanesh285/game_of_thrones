@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ThroneThree from '../../assets/images/ThroneThree.jpg'
+import ThroneVideo from '../../assets/images/GOT.mp4';
 import { lighten, darken } from '@mui/system';
 //import CSS
 import './ListOfCharacters.css'
@@ -99,7 +100,6 @@ const ListOfCharacters: React.FC = () => {
     fontSize: "2rem",
     zIndex: 9999,
     animation: "fadeOut 1s ease-in-out 2.5s forwards",
-    backgroundColor: 'black'
   };
 
   const welcomeTextStyle: React.CSSProperties = {
@@ -115,6 +115,11 @@ const ListOfCharacters: React.FC = () => {
         opacity: 0;
       }
      
+      50% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+      }
+
       100% {
         transform: scale(1) rotate(0deg);
         opacity: 1;
@@ -221,7 +226,7 @@ const ListOfCharacters: React.FC = () => {
     const timeout = setTimeout(() => {
       setShowWelcome(false); // Hide welcome message
       fetchCharacters(currentPage);// Fetch data after animation
-    }, 6000);
+    }, 300);
 
     return () => clearTimeout(timeout);
   }, [currentPage]);
@@ -329,7 +334,25 @@ const ListOfCharacters: React.FC = () => {
         ></div>
         {showWelcome && (
           <div style={welcomeScreenStyle}>
-            <h1 style={welcomeTextStyle}>When you play game of thrones, you win or you die. There is no middle ground!.</h1>
+          <video
+          autoPlay
+          loop
+          muted
+          style={{
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100vw",  // Cover the entire viewport width
+            height: "100vh", // Cover the entire viewport height
+            objectFit: "cover", // Make sure the video fills the screen
+            transform: "rotate(0deg)", // Rotate the video horizontally
+            transformOrigin: "center", // Center the rotation
+            zIndex: -1, // Make sure video stays in the background
+          }}
+        >
+          <source src={ThroneVideo} type="video/mp4" />
+        </video>
+        <h1 style={welcomeTextStyle}>When you play game of thrones, you win or you die. There is no middle ground!.</h1>
           </div>
         )}
         {!showWelcome && (
