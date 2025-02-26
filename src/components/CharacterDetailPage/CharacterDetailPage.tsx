@@ -29,7 +29,7 @@ const CharacterDetails: React.FC = () => {
 
         if (selectedChar) {
           setCharacter(selectedChar);
-          const familyName = selectedChar.family
+          const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName)
 
           // Find characters with the same last name (excluding current character)
           const filteredChars = allCharacters.map((char) => ({
@@ -46,6 +46,39 @@ const CharacterDetails: React.FC = () => {
       })
       .catch((error) => console.error("Error fetching character details:", error));
   }, [id]);
+
+  const normalizeFamilyName = (family: string | null, fullName: string) => {
+    if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
+  
+    const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
+    
+    const familyMappings: Record<string, string> = {
+    "Stark": "House Stark",
+    "stark": "House Stark",
+  
+    "Lannister": "House Lannister",
+    "lannister": "House Lannister",
+    "Lanister": "House Lannister",
+    "lanister": "House Lannister",
+
+    "targaryan":"House Targaryen",
+    "targaryen":"House Targaryen",
+
+    "Baratheon": "House Baratheon",
+
+    "unknown": fullName,
+    "unkown": fullName, // Fix typo
+    "": fullName,
+    "none": fullName,
+
+    "Greyjoy": "House Greyjoy",
+
+    "bolton": "House Bolton"
+
+    };
+  
+    return familyMappings[cleanFamily] || family 
+  };
 
   if (!character) return <h2>Loading...</h2>;
 

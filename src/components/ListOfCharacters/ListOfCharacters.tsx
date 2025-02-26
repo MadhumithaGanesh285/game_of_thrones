@@ -4,23 +4,21 @@ import {
   Card,
   CardContent,
   Button,
-  TextField,
   Typography,
   Box,
   styled,
   ThemeProvider,
   createTheme,
-  Autocomplete,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import ThroneThree from '../../assets/images/ThroneThree.jpg'
 import ThroneVideo from '../../assets/images/GOT.mp4';
-import { lighten, darken } from '@mui/system';
 //import CSS
 import './ListOfCharacters.css'
 
 //import icons
 import ScrollToTopButton from '../ScrollToTop/ScrollToTop';
+import SearchComponent from '../SerachFamilyOrCharacter/SearchFamilyOrCharacter';
 
 // Define the types for your data
 interface Character {
@@ -138,25 +136,9 @@ const ListOfCharacters: React.FC = () => {
     }
   `, styleSheet.cssRules.length);
 
-  const GroupHeader = styled('div')(({ theme }) => ({
-    position: 'sticky',
-    top: '-8px',
-    padding: '4px 10px',
-    color: theme.palette.primary.main,
-    backgroundColor: lighten(theme.palette.primary.light, 0.85),
-    ...theme.applyStyles('dark', {
-      backgroundColor: darken(theme.palette.primary.main, 0.8),
-    }),
-  }));
-
-  const GroupItems = styled('ul')({
-    padding: 0,
-  });
-
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
   const [showWelcome, setShowWelcome] = useState(true); // New state for animation
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
 
   //Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -176,10 +158,8 @@ const ListOfCharacters: React.FC = () => {
         imageUrl: character.imageUrl,
         house: character.house ? character.house.name : character.fullName,
         id: character.id ? character.id : 0,
-        family: character.family
+        family: normalizeFamilyName(character.family, character.fullName)
       }));
-
-      console.log(response.data, formattedCharacters, "fetched")
       setCharacters(formattedCharacters);
       setTotalPages(Math.ceil(response.data.length / rowsPerPage));
       setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
@@ -191,34 +171,39 @@ const ListOfCharacters: React.FC = () => {
     }
   };
 
+  const normalizeFamilyName = (family: string | null, fullName: string) => {
+    if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
+  
+    const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
+    
+    const familyMappings: Record<string, string> = {
+    "Stark": "House Stark",
+    "stark": "House Stark",
+  
+    "Lannister": "House Lannister",
+    "lannister": "House Lannister",
+    "Lanister": "House Lannister",
+    "lanister": "House Lannister",
 
-  const filterSearchPagination = (searchValue: string) => {
-    const sortedFilteredData = characterData
-      .filter((character) =>
-        character.name.toLowerCase().includes(searchValue) ||
-        character.family.toLowerCase().includes(searchValue)
-      )
-      .sort((a, b) => a.name.localeCompare(b.name)); // Sorting by name, you can modify this sorting as needed
-    const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
-    const endIndex = 1 + rowsPerPage;  // End index for slicing
-    setTotalPages(Math.ceil(sortedFilteredData.length / rowsPerPage));
-    console.log(startIndex, endIndex, "1")
-    setPaginatedCharacters(sortedFilteredData.slice(startIndex, endIndex));
-  }
+    "targaryan":"House Targaryen",
+    "targaryen":"House Targaryen",
 
-  const handleSearchFilterChange = (event: React.SyntheticEvent, newValue: Character | null) => {
-    setSelectedCharacter(newValue);
-    // Apply dynamic filtering and sorting
-    const searchValue = newValue ? newValue.name.toLowerCase() : '';
-    filterSearchPagination(searchValue)
+    "Baratheon": "House Baratheon",
+
+    "unknown": fullName,
+    "unkown": fullName, // Fix typo
+    "": fullName,
+    "none": fullName,
+
+    "Greyjoy": "House Greyjoy",
+
+    "bolton": "House Bolton"
+
+    };
+  
+    return familyMappings[cleanFamily] || family 
   };
-
-  const handleInputChange = (event: React.SyntheticEvent, value: string) => {
-    // Apply filtering and sorting as the user types
-    const searchValue = value.toLowerCase();
-    filterSearchPagination(searchValue)
-  };
-
+  
   // ---------------------------------------------------------------------UseEffects---------------------------------------------------------------/
   //Trigger everyTime
   useEffect(() => {
@@ -260,6 +245,25 @@ const ListOfCharacters: React.FC = () => {
     );
   }
 
+  const handleSearch = (event: React.SyntheticEvent, value: string) => {
+    const searchValue = value.toLowerCase();
+    const filtered = characterData
+    .filter(character => {
+      const lowerSearch = searchValue.toLowerCase();
+      return (
+        character.name.toLowerCase().includes(lowerSearch) ||
+        character.family.toLowerCase().includes(lowerSearch) ||
+        character.family.toLowerCase().includes(lowerSearch.replace(/^house\s+/, ''))
+      );
+    })
+    .sort((a, b) => a.family.localeCompare(b.family));
+    const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
+    const endIndex = startIndex + rowsPerPage;  // End index for slicing
+    setTotalPages(Math.ceil(filtered.length / rowsPerPage));
+    setPaginatedCharacters(filtered.slice(startIndex, endIndex));
+  };
+
+  
   return (
     <ThemeProvider theme={theme}>
       <div className='backgroundColor' style={{ display: "flex", width: "100vw", height: "90vh" }}>
@@ -267,50 +271,9 @@ const ListOfCharacters: React.FC = () => {
           <h1 className="got-text" style={{ margin: 0 }}>Game Of Thrones</h1>
           <div style={{ flex: 1, paddingRight: 5 }}></div>
           <div style={{ marginRight: '70px' }}>
-            <Autocomplete
-              disablePortal
-              options={[...characterData] // Make a copy of the array to avoid mutating state
-                .map((char) => ({
-                  ...char,
-                  family: `House ${char.family.replace(/house /i, '').trim()}`, // Normalize family names
-                  fullName: `FullName ${char.name.replace(/FullName/i, '').trim()}`,
-                }))
-                .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
-                .filter((value, index, self) => // Remove duplicate names based on `name` or `fullName`
-                index === self.findIndex((t) => t.name === value.name))
-              }
-              getOptionLabel={(option) => option.name}
-              value={selectedCharacter}
-              onChange={handleSearchFilterChange}
-              onInputChange={handleInputChange}
-              filterOptions={(options, state) => {
-                const searchValue = state.inputValue.toLowerCase();
-                return options.filter(
-                  (option) =>
-                    option.name.toLowerCase().includes(searchValue) ||
-                    option.family.toLowerCase().includes(searchValue)
-                );
-              }}
-              sx={{ width: 300, backgroundColor: 'white' }}
-              groupBy={(option) => option.family} // Now properly sorted, avoiding duplicates
-              renderInput={(params) => <TextField {...params} label="Family / Character" 
-              sx={{
-                '& .MuiInputLabel-root': {
-                  fontWeight:'bold',
-                  backgroundColor:'white'
-                },
-                '& .MuiOutlinedInput-root': {
-                  color: 'green' // Change the text color inside the input to green
-                }
-              }}
-              />}
-              renderGroup={(params) => (
-                <li key={params.key}>
-                  <GroupHeader>{params.group}</GroupHeader>
-                  <GroupItems style={{ listStyleType: 'none', padding: 0 }}>{params.children}</GroupItems>
-                </li>
-              )}
-            />
+          <Box sx={{ marginTop: '20px', width: '100%', maxWidth: '500px', marginBottom: '20px' }}>
+          <SearchComponent characterData={characterData} onSearch={handleSearch} />
+        </Box>
           </div>
         </div>
         <div
