@@ -1,10 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaArrowLeft } from "react-icons/fa"; // Import back arrow icon
+
+//import icons
+import { FaArrowLeft } from "react-icons/fa"; 
 import { TbRefresh } from "react-icons/tb";
+
+//import CSS
 import './CharacterDetial.css';
+
+//import Components
 import ChatBot from "../ChatBot/ChatBot";
+
+//define interface
 interface Character {
   id: number;
   firstName: string;
@@ -33,12 +41,14 @@ const CharacterDetails: React.FC = () => {
         if (selectedChar) {
           setCharacter(selectedChar);
           setSelectedDetails(selectedChar.fullName);
+
+          //To avoid duplicate names of the selected Family
           const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName)
 
           // Find characters with the same last name (excluding current character)
           const filteredChars = allCharacters.map((char) => ({
             ...char,
-            family: normalizeFamilyName(char.family, char.fullName), // Normalize family name
+            family: normalizeFamilyName(char.family, char.fullName), // Normalize family name from the original response
           }))
             .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
             .filter(
@@ -49,6 +59,7 @@ const CharacterDetails: React.FC = () => {
       })
       .catch((error) => console.error("Error fetching character details:", error));
   }, [id]);
+
 
   const normalizeFamilyName = (family: string | null, fullName: string) => {
     if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
@@ -93,7 +104,7 @@ const CharacterDetails: React.FC = () => {
           <FaArrowLeft /> Go Back
         </button>
 
-        {/* Character Name */}
+        {/* Character Name as heading*/}
         <h2 className="h2tag">
           {character.fullName}
         </h2>
@@ -115,13 +126,13 @@ const CharacterDetails: React.FC = () => {
             <p>Family: {character.family}</p>
           </div>
 
+          {/* To generate Data from wikipedia */}
           <ChatBot characterName={selectedDeatils} />
         </div>
 
         {/* Related Family Members Header */}
         <div className="family-header">
-          {/* Replace the refresh button with the <Refresh /> component */}
-          <TbRefresh onClick={() => window.location.reload()} className="refresh-icon" />
+           <TbRefresh onClick={() => window.location.reload()} className="refresh-icon" />
           <h3>Family-{character.family}</h3>
           <button disabled className="record-button">
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}

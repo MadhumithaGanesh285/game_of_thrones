@@ -27,12 +27,14 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* heading */
 .h2tag {
     text-Align: center; 
     font-weight: bold;
     padding: 15px 0; 
     border-Bottom: 2px solid #ddd;
-}          
+}
+
 /* Character Details Section */
 .character-container {
     display: flex;
@@ -58,6 +60,7 @@
     object-fit: cover;
   }
 
+  /* Refresh Button */
   .refresh-icon {
     padding: 5px;
     font-size: 20px;
@@ -71,33 +74,7 @@
     height:auto;
   }
 
-  /* Mobile View: Stack image & details */
-  @media (max-width: 768px) {
-    .character-container {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .character-image {
-      width: 100%;
-      height: auto;
-    }
-
-    .refresh-icon {
-        padding: 10px;
-        font-size: 31px;
-        background-color:#1c274c;
-        color: white;
-        border: none;
-        border-radius: 20%;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        margin-right: 15px;
-        height:auto;
-    }
-  }
-
-  /* Related Family Members Section */
+    /* Related Family Members Section */
   .family-header {
     display: flex;
     align-items: center;
@@ -139,4 +116,30 @@
     height: 80%;
     border-radius: 10px;
     object-fit: cover;
+  }
+  
+  /* Mobile View: Stack image & details */
+  @media (max-width: 768px) {
+    .character-container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .character-image {
+      width: 100%;
+      height: auto;
+    }
+
+    .refresh-icon {
+        padding: 10px;
+        font-size: 31px;
+        background-color:#1c274c;
+        color: white;
+        border: none;
+        border-radius: 20%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin-right: 15px;
+        height:auto;
+    }
   }
