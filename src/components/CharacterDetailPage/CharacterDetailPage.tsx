@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa"; // Import back arrow icon
+import Refresh from '../../assets/svg/Refresh';
 import './CharacterDetial.css';
 interface Character {
   id: number;
@@ -106,7 +107,7 @@ const CharacterDetails: React.FC = () => {
             marginTop: "20px",
             padding: "10px 20px",
             fontSize: "16px",
-            backgroundColor: "#007bff",
+            backgroundColor: "rgb(28 39 76)",
             color: "white",
             border: "none",
             borderRadius: "5px",
@@ -142,10 +143,8 @@ const CharacterDetails: React.FC = () => {
 
         {/* Related Family Members Header */}
         <div className="family-header">
-          <button onClick={() => window.location.reload()} className="refresh-button">
-            🔄
-          </button>
-          <h3 style={{whiteSpace:'nowrap',padding:'10px'}}>Family-{character.family}</h3>
+          <Refresh onClick={() => window.location.reload()} />
+          <h3 style={{ whiteSpace: 'nowrap', padding: '10px' }}>Family-{character.family}</h3>
           <button disabled className="record-button">
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}
           </button>
