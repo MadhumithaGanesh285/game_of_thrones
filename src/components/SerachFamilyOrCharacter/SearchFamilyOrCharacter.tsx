@@ -52,7 +52,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ characterData, onSear
           label="Search by name"
           variant="outlined"
           fullWidth
-          sx={{ width: 300, backgroundColor: 'white' }}
+          sx={{ width: 300, backgroundColor: 'white', fontWeight:'bold' }}
         />
       )}
     />

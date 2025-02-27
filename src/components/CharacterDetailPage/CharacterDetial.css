@@ -1,51 +1,118 @@
-.detailPageBoxOne {
-    flex-direction: column  !important;
-    min-height: 100vh !important;
-    padding: 13px !important;
-    background-color: #f5f5f5 !important;
-}
-
-.detailPageBoxOne, .detailPageBoxThree, .detailPageBoxFour, .detailPageBoxSeven {
-    display: flex !important;
-    align-items: center !important;
-}
-
-.detailPageBoxTwo {
-    width:100%;
-    max-width: 1200px;
-    margin-bottom: 4px;
-    justify-content: center;
-    position: relative;
-}
-
-.detailPageBoxThree {
-   justify-content: space-around;
-    width: 100%;
-}
-
-.detailPageBoxFour {
-    width: 100%;
-    height: 313px;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 50%;
-    border: 5px solid white;
-    margin-bottom: 2px;
-}
-
-.detailPageBoxFive {
-    align-items: center;
-}
-
-.detailPageBoxFive, .detailPageBoxSix {
+.mainDiv {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1px;
+    flex-direction: column;
+    align-items: center;
+    min-height: 95vh;
+    padding:20px;
 }
 
-.CardMediaOne {
-    width: auto !important;
-    height:100% !important;
-    max-width: 100% !important;
-    object-fit: contain !important;
+.mainCard {
+    max-width: 1200px;
+    width:100%;
+    padding:20px;
+    border-radius: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+.backButton {
+    margin-top: 20px !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+    background-color: #007bff !important;
+    color:white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+.h2tag {
+    text-Align: center; 
+    font-weight: bold;
+    padding: 15px 0; 
+    border-Bottom: 2px solid #ddd;
+}
+
+.detailSection {
+    display: flex;
+    align-Items: center;
+    justify-Content: space-between;
+    gap: 30px;
+    padding: 20px;
+    border-Radius: 10px;
+    box-Shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-Color: #f9f9f9;
+}
+
+.detailSubSection {
+    text-Align: left;
+    flex: 1; 
+    font-Weight:bold;
+}
+
+.imageCSS {
+    width: 200px; 
+    border-Radius: 10px;
+    object-Fit: cover; 
+    height:270px;
+}
+
+.relatedFamilyMemberCSS {
+    display: flex;
+    align-Items: center;
+    justify-Content: space-between;
+    margin-Top: 20px;
+    padding: 0 20px;
+}
+
+.refreshButtob {
+    padding: 8px 15px;
+    font-Size: 14px;
+    background-Color: rgb(0 166 237);
+    color: white;
+    border: none;
+    border-Radius: 5px;
+    cursor: pointer;
+    box-Shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.centreTitle {
+    flex: 1; 
+    text-Align: center;
+}
+
+.recordButton {
+    padding: 5px 15px;
+    font-Size: 14px;
+    background-Color: #ddd;
+    color: #555;
+    border: none;
+    border-Radius: 5px;
+    cursor: not-allowed;
+}
+
+.relatedCharacters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.relatedCharacterImage{
+    width: 100%; 
+    height:80%; 
+    border-Radius: 10px; 
+    object-Fit: cover;
+}
+
+@media (max-width: 412px) {
+    .character-details {
+      flex-direction: column; /* Stack image and details vertically */
+    }
+    .img {
+      width: 100%;
+      height: auto;
+    }
+  }
