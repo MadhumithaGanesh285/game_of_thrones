@@ -14,10 +14,15 @@ import {
   Container
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import ScrollToTopButton from "../ScrollToTop/ScrollToTop";
-import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
+
+//import CSS
 import "./ListOfCharacters.css";
 
+//import Components
+import ScrollToTopButton from "../ScrollToTop/ScrollToTop";
+import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
+
+//define Interface
 interface Character {
   name: string;
   imageUrl: string;
@@ -64,19 +69,20 @@ const PaginationContainer = styled(Box)({
 });
 
 
+//Component
 const ListOfCharacters: React.FC = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
-  const [showWelcome, setShowWelcome] = useState(true);
+
+  //Pagination States
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>(
-    []
-  );
+  const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([] );
   const rowsPerPage = isMobile ? 6 : 12;
 
+  //Function to fetch Data
   const fetchCharacters = async (page: number) => {
     try {
       setLoading(true);
@@ -99,6 +105,7 @@ const ListOfCharacters: React.FC = () => {
     }
   };
 
+  //Duplication Family name is grouped together
   const normalizeFamilyName = (family: string | null, fullName: string) => {
     if (!family || family.toLowerCase() === "none") return fullName;
 
@@ -116,7 +123,7 @@ const ListOfCharacters: React.FC = () => {
       "baratheon": "House Baratheon",
 
       "unknown": fullName,
-      "unkown": fullName, // Fix typo
+      "unkown": fullName,
       "": fullName,
       "none": fullName,
 
@@ -132,14 +139,11 @@ const ListOfCharacters: React.FC = () => {
     return familyMappings[cleanFamily] || family
   };
 
+  //this load intially and when we change a page
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowWelcome(false);
-      fetchCharacters(currentPage);
-    }, 300);
-
-    return () => clearTimeout(timeout);
+    fetchCharacters(currentPage);
   }, [currentPage]);
+
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
@@ -147,11 +151,17 @@ const ListOfCharacters: React.FC = () => {
     setPaginatedCharacters(characterData.slice(startIndex, endIndex));
   }, [currentPage, characterData]);
 
+
+  //Setting new page number
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+  
+  //Searching Values
   const handleSearch = (event: React.SyntheticEvent, value: string) => {
     const searchValue = value.toLowerCase();
+
+    //It search for Character, Family Name and Grouping duplicate Family Name Search
     const filtered = characterData
       .filter(character => {
         const lowerSearch = searchValue.toLowerCase();
@@ -162,21 +172,22 @@ const ListOfCharacters: React.FC = () => {
         );
       })
       .sort((a, b) => a.family.localeCompare(b.family));
+
     const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
     const endIndex = startIndex + rowsPerPage;  // End index for slicing
     setTotalPages(Math.ceil(filtered.length / rowsPerPage));
     setPaginatedCharacters(filtered.slice(startIndex, endIndex));
   };
 
+  //return 
   return (
     <ThemeProvider theme={theme}>
-      <div className="backgroundColor">
+      <div className="MainDivForCharacterList">
         <Box className="mainBox">
           {/* Logo - Centered in mobile, left-aligned in desktop */}
           <Box className="logoBox">
-            <h1 className="got-text">Game Of Thrones Families</h1>
+            <h1 className="logo-text">Game Of Thrones Families</h1>
           </Box>
-
           {/* Search Bar - Moves below the logo on mobile */}
           <Box className="searchBox">
             <SearchComponent characterData={characterData} onSearch={handleSearch} />
@@ -184,15 +195,15 @@ const ListOfCharacters: React.FC = () => {
         </Box>
         {/* Background Image */}
         <div className="backgroundImageDiv"></div>
-
         {/* Centered Content */}
-        <Container maxWidth="lg" className="containerCentered">
+        <Container maxWidth="lg" className="contentCentered">
           {/* Character Grid */}
           <Box p={2}>
-            <Grid container spacing={3} justifyContent="center" className="paginatedMainGrid">
+            <Grid container spacing={3} className="paginatedMainGrid">
               {loading ? (
                 <Typography variant="h5">Loading...</Typography>
               ) : (
+                //this where api data render
                 paginatedCharacters.map((character) => (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={character.id}>
                     <Link to={`/Characters/${character.id}`} className="redirect">
@@ -227,7 +238,7 @@ const ListOfCharacters: React.FC = () => {
               Next
             </Button>
           </PaginationContainer>
-
+          {/* this shows up when we are in bottom of screen*/}
           <ScrollToTopButton />
         </Container>
       </div>
