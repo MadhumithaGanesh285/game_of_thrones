@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa"; // Import back arrow icon
-import Refresh from '../../assets/svg/Refresh';
+import { TbRefresh } from "react-icons/tb";
 import './CharacterDetial.css';
 interface Character {
   id: number;
@@ -87,39 +87,16 @@ const CharacterDetails: React.FC = () => {
   if (!character) return <h2>Loading...</h2>;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minHeight: "95vh", padding: "20px" }}>
-
+    <div className="mainDiv">
       {/* Main Card */}
-      <div
-        style={{
-          maxWidth: "1200px",
-          width: "100%",
-          padding: "20px",
-          borderRadius: "15px",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
-          backgroundColor: "#fff",
-        }}
-      >
+      <div className="mainCard">
         {/* Go Back Button */}
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            fontSize: "16px",
-            backgroundColor: "rgb(28 39 76)",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-          }}
-        >
+        <button className='backButton' onClick={() => navigate("/")}>
           <FaArrowLeft /> Go Back
         </button>
 
         {/* Character Name */}
-        <h2 style={{ textAlign: "center", fontWeight: "bold", padding: "15px 0", borderBottom: "2px solid #ddd" }}>
+        <h2 className="h2tag">
           {character.fullName}
         </h2>
 
@@ -143,8 +120,9 @@ const CharacterDetails: React.FC = () => {
 
         {/* Related Family Members Header */}
         <div className="family-header">
-          <Refresh onClick={() => window.location.reload()} />
-          <h3 style={{ whiteSpace: 'nowrap', padding: '10px' }}>Family-{character.family}</h3>
+          {/* Replace the refresh button with the <Refresh /> component */}
+          <TbRefresh onClick={() => window.location.reload()} className="refresh-icon"/>
+          <h3>Family-{character.family}</h3>
           <button disabled className="record-button">
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}
           </button>
@@ -168,104 +146,6 @@ const CharacterDetails: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* CSS Styles */}
-      <style>
-        {`
-          /* Character Details Section */
-          .character-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 30px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            background-color: #f9f9f9;
-          }
-
-          .character-details {
-            flex: 1;
-            font-weight: bold;
-            text-align: left;
-          }
-
-          .character-image {
-            width: 200px;
-            height: 270px;
-            border-radius: 10px;
-            object-fit: cover;
-          }
-
-          /* Mobile View: Stack image & details */
-          @media (max-width: 768px) {
-            .character-container {
-              flex-direction: column;
-              text-align: center;
-            }
-
-            .character-image {
-              width: 100%;
-              height: auto;
-            }
-          }
-
-          /* Related Family Members Section */
-          .family-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding: 0 20px;
-          }
-
-          .refresh-button {
-            padding: 8px 15px;
-            font-size: 14px;
-            background-color: rgb(0 166 237);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          }
-
-          .record-button {
-            padding: 5px 15px;
-            font-size: 14px;
-            background-color: #ddd;
-            color: #555;
-            border: none;
-            border-radius: 5px;
-            cursor: not-allowed;
-          }
-
-          /* Related Characters */
-          .related-characters {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-            padding: 0 10px;
-          }
-
-          .related-character-card {
-            cursor: pointer;
-            text-align: center;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-          }
-
-          .related-character-image {
-            width: 100%;
-            height: 80%;
-            border-radius: 10px;
-            object-fit: cover;
-          }
-        `}
-      </style>
     </div>
   );
 };
