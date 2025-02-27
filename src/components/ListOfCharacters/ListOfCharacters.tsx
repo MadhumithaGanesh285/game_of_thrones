@@ -115,12 +115,7 @@ const ListOfCharacters: React.FC = () => {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowWelcome(false);
-      fetchCharacters(currentPage);
-    }, 300);
-
-    return () => clearTimeout(timeout);
+    fetchCharacters(currentPage);
   }, [currentPage]);
 
   useEffect(() => {
@@ -152,66 +147,70 @@ const ListOfCharacters: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="backgroundColor">
-        <Box className="mainBox">
-          {/* Logo - Centered in mobile, left-aligned in desktop */}
-          <Box className="logoBox">
-            <h1 className="got-text">Game Of Thrones Families</h1>
-          </Box>
+      <div className="backgroundMain">
+        {/* Show Loading First */}
+        {loading ? (
+          <Box className="boxOne"></Box>
+        ) : (
+          <>
+            {/* Background Image (Only after loading) */}
+            <div className="backgroundImageDiv"></div>
+            <Box className="boxTwo">
+              {/* Game of Thrones Title aligned to the left */}
+              <Typography
+                variant={isMobile ? "h4" : "h2"}
+                className="got-text">
+                Game Of Thrones Families
+              </Typography>
 
-          {/* Search Bar - Moves below the logo on mobile */}
-          <Box className="searchBox">
-            <SearchComponent characterData={characterData} onSearch={handleSearch} />
-          </Box>
-        </Box>
-        {/* Background Image */}
-        <div className="backgroundImageDiv"></div>
+              {/* Search Bar aligned to the right */}
+              <Box className="boxThree">
+                <SearchComponent characterData={characterData} onSearch={handleSearch} />
+              </Box>
+            </Box>
 
-        {/* Centered Content */}
-        <Container maxWidth="lg" className="containerCentered">
-          {/* Character Grid */}
-          <Box p={2}>
-            <Grid container spacing={3} justifyContent="center">
-              {loading ? (
-                <Typography variant="h5">Loading...</Typography>
-              ) : (
-                paginatedCharacters.map((character) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id} className="paginatedMainGrid">
-                    <Link to={`/Characters/${character.id}`} className="redirect">
-                      <CharacterCard >
-                        <CardContent>
-                          <ImageContainer>
-                            <img
-                              src={character.imageUrl}
-                              alt={character.name}
-                              className="imageContainerImg"
-                            />
-                          </ImageContainer>
-                          <Typography variant="h6" className="paginatedTypoForName">
-                            {character.name}
-                          </Typography>
-                        </CardContent>
-                      </CharacterCard>
-                    </Link>
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          </Box>
+            {/* Centered Content */}
+            <Container maxWidth="lg" className="containerCentered">
+              <Box p={2}>
+                <Grid container spacing={3} justifyContent="center">
+                  {paginatedCharacters.map((character) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={character.id} className="paginatedMainGrid">
+                      <Link to={`/Characters/${character.id}`} className="redirect">
+                        <CharacterCard>
+                          <CardContent>
+                            <ImageContainer>
+                              <img
+                                src={character.imageUrl}
+                                alt={character.name}
+                                className="imageContainerImg"
+                              />
+                            </ImageContainer>
+                            <Typography variant="h6" className="paginatedTypoForMain">
+                              {character.name}
+                            </Typography>
+                          </CardContent>
+                        </CharacterCard>
+                      </Link>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
 
-          {/* Pagination */}
-          <PaginationContainer>
-            <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} style={{ backgroundColor: currentPage === 1 ? "#ddd" : "#1976d2" }} disabled={currentPage === 1}>
-              Previous
-            </Button>
-            <Typography variant="h6" sx={{ color: 'white' }}>{currentPage} / {totalPages}</Typography>
-            <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-              Next
-            </Button>
-          </PaginationContainer>
+              {/* Pagination */}
+              <PaginationContainer>
+                <Button variant="contained" style={{ backgroundColor: currentPage === 1 ? "#ddd" : "#1976d2" }} onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                  Previous
+                </Button>
+                <Typography variant="h6" sx={{color:'white'}}>{currentPage} / {totalPages}</Typography>
+                <Button variant="contained" style={{ backgroundColor: currentPage === totalPages ? "#ddd" : "#1976d2" }} onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                  Next
+                </Button>
+              </PaginationContainer>
 
-          <ScrollToTopButton />
-        </Container>
+              <ScrollToTopButton />
+            </Container>
+          </>
+        )}
       </div>
     </ThemeProvider>
   );

@@ -1,22 +1,22 @@
-.got-text {
-  font-family: 'Vectis Condensed', serif;
-  font-size: 48px;
-  color: silver;
-  text-transform: none;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
-  margin: 0;
+.backgroundMain {
+  width:100vw;
+  height:100vh;
+  position: relative;
 }
 
-.backgroundMainDiv {
-    padding: 20px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    min-height: 100vh;
-    position: relative;
-  }
+.boxOne {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-Items: center;
+  justify-Content: center;
+  background-color: #000;
+  color: white;
+  font-size: 2rem;
+  background-image: url('../../assets/images/data-loading.gif');
+  background-size: cover;
+  background-position: center;
+}
 
 .backgroundImageDiv {
   position: absolute;
@@ -28,36 +28,40 @@
   background-size: cover;
   background-position: center;
   z-index: -2;
+  height:439vh;
 }
 
-.imageContainerImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.boxTwo {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content: center;
+  width:100%;
+  padding-left: 16px;
+  padding-right: 16px;            
 }
 
-.mainBox {
-  display: flex;
-  flex-direction: column; /* Stack elements in a column on mobile */
-  align-items: center; /* Center items horizontally on mobile */
-  justify-content: space-between; /* Space out items in desktop view */
-  width: 100%;
-  padding: 10px 20px;
-}
-
-.logoBox {
+.got-text {
+  font-family: 'Vectis Condensed', serif;
+  font-size: 48px !important;
+  color: silver;
+  text-transform: none;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+  margin: 8 !important;
   text-align: center;
-  width: 100%;
-  margin-bottom: 2;
+  flex:1;
+  margin-top: 1% !important;
 }
 
-.searchBox {
-  display: flex;
-  justify-content: center; /* Default for mobile (small screens) */
+.boxThree {
+  max-width: 500px;
   width: 100%;
-  max-width: 400px;
-  position: relative;
-  right: -4px; /* Default for mobile (small screens) */
+  margin-top:2% !important;
+  display: flex;
+  justify-content:center;
+  flex: 1;
+  margin-right: 5%;
 }
 
 .containerCentered{
@@ -68,7 +72,13 @@
 }
 
 .paginatedMainGrid {
-  padding-left: 49px;
+  padding-left: 82px !important;
+}
+
+.imageContainerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .redirect {
@@ -83,18 +93,31 @@
 
 /* Styles for medium and larger screens (md breakpoint) */
 @media (min-width: 768px) { /* Adjust according to your breakpoint */
-  .mainBox {
+
+  .backgroundImageDiv {
+    height:100vh;
+  }
+
+ .boxTwo {
     flex-direction:row;
-    align-items: center;
+    justify-content:space-between;           
   }
 
-  .logoBox {
-    text-align:left;
-    margin-bottom: 0;
+  .got-text {
+    text-align: left;
   }
 
-  .searchBox {
-    justify-content: flex-end; /* Align right for medium and larger screens */
-    right: 70px; /* Adjust for larger screens */
+  .boxThree {
+    max-width: 500px;
+    width: 100%;
+    margin-top:0 ;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1
   }
+
+  .paginatedMainGrid {
+    padding-left: 49px !important;
+  }
+
 }
