@@ -1,6 +1,15 @@
+.backgroundColor {
+  padding: 20px;
+  /* max-width: 2000px; */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+}
+
 .got-text {
   font-family: 'Vectis Condensed', serif;
-  font-size: 48px;
+  font-size: 37px;
   color: silver;
   text-transform: none;
   letter-spacing: 2px;
@@ -28,7 +37,7 @@
   background-size: cover;
   background-position: center;
   z-index: -2;
-  height: 259vh;
+  height: 263vh;
 }
 
 .imageContainerImg {
@@ -69,7 +78,7 @@
 }
 
 .paginatedMainGrid {
-  padding-left: 86px;
+  padding-left: 22px;
 }
 
 .redirect {
@@ -99,11 +108,11 @@
     right: 70px; /* Adjust for larger screens */
   }
 
-  .paginatedMainGrid {
-    padding-left: 49px;
-  }
-
   .backgroundImageDiv {
     height: 122vh;
+  }
+
+  .got-text {
+    font-size: 48px;
   }
 }

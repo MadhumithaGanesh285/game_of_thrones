@@ -189,7 +189,7 @@ const ListOfCharacters: React.FC = () => {
         <Container maxWidth="lg" className="containerCentered">
           {/* Character Grid */}
           <Box p={2}>
-            <Grid container spacing={3} justifyContent="center">
+            <Grid container spacing={3} justifyContent="center" className="paginatedMainGrid">
               {loading ? (
                 <Typography variant="h5">Loading...</Typography>
               ) : (
