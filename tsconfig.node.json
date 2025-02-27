@@ -18,7 +18,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "esModuleInterop": true,     // Enable interoperability between CommonJS and ES modules
+    "resolveJsonModule": true,   // Resolve `.json` modules
+    "forceConsistentCasingInFileNames": true, // Enforce consistent file casing
+    "outDir": "./dist",           // Output directory for compiled files
+    "rootDir": "./src"    
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "src/**/*.ts", "cypress/**/*.ts"],  // Include TypeScript files from both `src` and `cypress`
+  "exclude": ["node_modules"]  
 }

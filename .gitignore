@@ -28,3 +28,20 @@ dist-ssr
 /workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+
+# Cypress test results and videos
+cypress/videos/
+cypress/screenshots/
+
+# Cypress logs and reports
+cypress/results/
+cypress/reports/
+
+# Cypress configuration cache
+.cypress_cache/
+
+# Cypress environment variables (if used)
+cypress.env.json
+
+# Electron crash dumps (if using the built-in Electron browser)
+debug.log
