@@ -73,8 +73,10 @@ const CharacterDetails: React.FC = () => {
 
       "bolton": "House Bolton",
 
-      "greyjoy": "House Greyjoy"
-
+      "greyjoy": "House Greyjoy",
+      
+      "lorath": "House Lorathi",
+      "lorathi": "House Lorathi"
     };
 
     return familyMappings[cleanFamily] || family
