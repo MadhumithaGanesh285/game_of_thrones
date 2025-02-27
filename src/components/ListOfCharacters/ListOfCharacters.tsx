@@ -122,7 +122,10 @@ const ListOfCharacters: React.FC = () => {
 
       "bolton": "House Bolton",
 
-      "greyjoy": "House Greyjoy"
+      "greyjoy": "House Greyjoy",
+
+      "lorath": "House Lorathi",
+      "lorathi": "House Lorathi"
 
     };
 
@@ -191,7 +194,7 @@ const ListOfCharacters: React.FC = () => {
                 <Typography variant="h5">Loading...</Typography>
               ) : (
                 paginatedCharacters.map((character) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id} className="paginatedMainGrid">
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id}>
                     <Link to={`/Characters/${character.id}`} className="redirect">
                       <CharacterCard >
                         <CardContent>
