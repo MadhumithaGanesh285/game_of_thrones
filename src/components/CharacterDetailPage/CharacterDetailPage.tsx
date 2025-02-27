@@ -4,6 +4,7 @@ import axios from "axios";
 import { FaArrowLeft } from "react-icons/fa"; // Import back arrow icon
 import { TbRefresh } from "react-icons/tb";
 import './CharacterDetial.css';
+import ChatBot from "../ChatBot/ChatBot";
 interface Character {
   id: number;
   firstName: string;
@@ -19,6 +20,7 @@ const CharacterDetails: React.FC = () => {
   const navigate = useNavigate();
   const [character, setCharacter] = useState<Character | null>(null);
   const [relatedCharacters, setRelatedCharacters] = useState<Character[]>([]);
+  const [selectedDeatils, setSelectedDetails] = useState<string>('');
 
   useEffect(() => {
     axios
@@ -30,6 +32,7 @@ const CharacterDetails: React.FC = () => {
 
         if (selectedChar) {
           setCharacter(selectedChar);
+          setSelectedDetails(selectedChar.fullName);
           const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName)
 
           // Find characters with the same last name (excluding current character)
@@ -39,8 +42,7 @@ const CharacterDetails: React.FC = () => {
           }))
             .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
             .filter(
-              (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase())
-            );
+              (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase()))
 
           setRelatedCharacters(filteredChars);
         }
@@ -54,20 +56,15 @@ const CharacterDetails: React.FC = () => {
     const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
 
     const familyMappings: Record<string, string> = {
-      "Stark": "House Stark",
       "stark": "House Stark",
 
-      "Lannister": "House Lannister",
       "lannister": "House Lannister",
-      "Lanister": "House Lannister",
       "lanister": "House Lannister",
-      "House Lanister": "House Lannister",
-      "House Lannister": "lanister",
 
       "targaryan": "House Targaryen",
       "targaryen": "House Targaryen",
 
-      "Baratheon": "House Baratheon",
+      "baratheon": "House Baratheon",
 
       "unknown": fullName,
       "unkown": fullName, // Fix typo
@@ -76,7 +73,6 @@ const CharacterDetails: React.FC = () => {
 
       "bolton": "House Bolton",
 
-      "Greyjoy": "House Greyjoy",
       "greyjoy": "House Greyjoy"
 
     };
@@ -116,12 +112,14 @@ const CharacterDetails: React.FC = () => {
             <p>Title: {character.title}</p>
             <p>Family: {character.family}</p>
           </div>
+
+          <ChatBot characterName={selectedDeatils} />
         </div>
 
         {/* Related Family Members Header */}
         <div className="family-header">
           {/* Replace the refresh button with the <Refresh /> component */}
-          <TbRefresh onClick={() => window.location.reload()} className="refresh-icon"/>
+          <TbRefresh onClick={() => window.location.reload()} className="refresh-icon" />
           <h3>Family-{character.family}</h3>
           <button disabled className="record-button">
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}
