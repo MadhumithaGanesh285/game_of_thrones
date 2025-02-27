@@ -49,7 +49,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ characterData, onSear
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Search by name"
+          label="Search by Family/Character Name"
           variant="outlined"
           fullWidth
           sx={{ width: 300, backgroundColor: 'white', fontWeight:'bold' }}

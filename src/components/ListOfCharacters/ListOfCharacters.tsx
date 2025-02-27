@@ -14,7 +14,6 @@ import {
   Container
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import ThroneThree from "../../assets/images/ThroneThree.jpg";
 import ScrollToTopButton from "../ScrollToTop/ScrollToTop";
 import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
 import "./ListOfCharacters.css";
@@ -31,7 +30,7 @@ interface Character {
 const theme = createTheme();
 
 // Styled Components
-const CharacterCard = styled(Card)(({ theme }) => ({
+const CharacterCard = styled(Card)(() => ({
   border: "1px solid #ddd",
   borderRadius: "8px",
   width: "100%",
@@ -153,53 +152,23 @@ const ListOfCharacters: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="backgroundColor" style={{ minHeight: "100vh", position: "relative" }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' }, // Column on mobile, row on desktop
-            alignItems: { xs: 'center', md: 'center' }, // Center items in mobile view
-            justifyContent: 'space-between', // Space out elements on desktop
-            width: '100%',
-            padding: '10px 20px',
-          }}
-        >
+      <div className="backgroundColor">
+        <Box className="mainBox">
           {/* Logo - Centered in mobile, left-aligned in desktop */}
-          <Box sx={{ textAlign: { xs: 'center', md: 'left' }, width: '100%', marginBottom: { xs: 2, md: 0 } }}>
-            <h1 className="got-text" style={{ margin: 0 }}>Game Of Thrones Families</h1>
+          <Box className="logoBox">
+            <h1 className="got-text">Game Of Thrones Families</h1>
           </Box>
 
           {/* Search Bar - Moves below the logo on mobile */}
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: { xs: 'center', md: 'flex-end' }, // Centered in mobile, right-aligned in desktop
-              width: '100%',
-              maxWidth: '400px',
-              position:'relative',
-              right:{ xs: '-4px', md: '70px' }
-            }}
-          >
+          <Box className="searchBox">
             <SearchComponent characterData={characterData} onSearch={handleSearch} />
           </Box>
         </Box>
         {/* Background Image */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: `url(${ThroneThree})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            zIndex: -2,
-          }}
-        ></div>
+        <div className="backgroundImageDiv"></div>
 
         {/* Centered Content */}
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1, textAlign: "center", pt: 3 }}>
+        <Container maxWidth="lg" className="containerCentered">
           {/* Character Grid */}
           <Box p={2}>
             <Grid container spacing={3} justifyContent="center">
@@ -207,18 +176,18 @@ const ListOfCharacters: React.FC = () => {
                 <Typography variant="h5">Loading...</Typography>
               ) : (
                 paginatedCharacters.map((character) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id} style={{paddingLeft:'49px'}}>
-                    <Link to={`/Characters/${character.id}`} style={{ textDecoration: "none" }}>
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id} className="paginatedMainGrid">
+                    <Link to={`/Characters/${character.id}`} className="redirect">
                       <CharacterCard >
                         <CardContent>
                           <ImageContainer>
                             <img
                               src={character.imageUrl}
                               alt={character.name}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              className="imageContainerImg"
                             />
                           </ImageContainer>
-                          <Typography variant="h6" sx={{ color: "white", mt: 1, textAlign: "center" }}>
+                          <Typography variant="h6" className="paginatedTypoForName">
                             {character.name}
                           </Typography>
                         </CardContent>
@@ -235,7 +204,7 @@ const ListOfCharacters: React.FC = () => {
             <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} style={{ backgroundColor: currentPage === 1 ? "#ddd" : "#1976d2" }} disabled={currentPage === 1}>
               Previous
             </Button>
-            <Typography variant="h6" sx={{color:'white'}}>{currentPage} / {totalPages}</Typography>
+            <Typography variant="h6" sx={{ color: 'white' }}>{currentPage} / {totalPages}</Typography>
             <Button variant="contained" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
               Next
             </Button>
