@@ -19,7 +19,6 @@ import { Link } from "react-router-dom";
 import "./ListOfCharacters.css";
 
 //import Components
-import ScrollToTopButton from "../ScrollToTop/ScrollToTop";
 import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
 
 //define Interface
@@ -238,8 +237,6 @@ const ListOfCharacters: React.FC = () => {
               Next
             </Button>
           </PaginationContainer>
-          {/* this shows up when we are in bottom of screen*/}
-          <ScrollToTopButton />
         </Container>
       </div>
     </ThemeProvider>
