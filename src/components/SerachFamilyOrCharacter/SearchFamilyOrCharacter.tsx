@@ -60,7 +60,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ characterData, onSear
             width: 300,
             backgroundColor: 'white', // Ensures input background is always white
             '& .MuiInputLabel-root': {
-              fontWeight: 'bold',
               backgroundColor: 'white', // Keeps label background white
               px: 0.5, // Adds padding to avoid overlap
             },

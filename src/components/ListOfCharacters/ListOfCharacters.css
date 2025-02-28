@@ -60,7 +60,6 @@
   background-size: cover;
   background-position: center;
   z-index: -2;
-  height: 263vh;
 }
 
 .contentCentered{
@@ -107,10 +106,6 @@
   .searchBox {
     justify-content: flex-end; /* Align right */
     right: 70px;
-  }
-
-  .backgroundImageDiv {
-    height: 122vh;
   }
 
   .logo-text {

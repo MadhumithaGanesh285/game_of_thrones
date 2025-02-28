@@ -80,7 +80,7 @@ const ListOfCharacters: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([] );
-  const rowsPerPage = isMobile ? 6 : 12;
+  const rowsPerPage = isMobile ? 4 : 8;
 
   //Function to fetch Data
   const fetchCharacters = async (page: number) => {
