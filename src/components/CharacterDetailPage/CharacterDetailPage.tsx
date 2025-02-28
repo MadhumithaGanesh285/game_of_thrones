@@ -10,7 +10,6 @@ import { TbRefresh } from "react-icons/tb";
 import './CharacterDetial.css';
 
 //import Components
-import ChatBot from "../ChatBot/ChatBot";
 import { normalizeFamilyName } from "../../utils/familyUtils";
 
 //define interface
@@ -29,7 +28,6 @@ const CharacterDetails: React.FC = () => {
   const navigate = useNavigate();
   const [character, setCharacter] = useState<Character | null>(null);
   const [relatedCharacters, setRelatedCharacters] = useState<Character[]>([]);
-  const [selectedDeatils, setSelectedDetails] = useState<string>('');
 
   useEffect(() => {
     axios
@@ -42,7 +40,6 @@ const CharacterDetails: React.FC = () => {
         if (!selectedChar) return;
 
         setCharacter(selectedChar);
-        setSelectedDetails(selectedChar.fullName);
         // Normalize the family name
         const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName);
 
@@ -92,9 +89,6 @@ const CharacterDetails: React.FC = () => {
             <p>Title: {character.title}</p>
             <p>Family: {character.family}</p>
           </div>
-
-          {/* To generate Data from wikipedia */}
-          <ChatBot characterName={selectedDeatils} />
         </div>
 
         {/* Related Family Members Header */}
