@@ -48,7 +48,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ characterData, onSear
     <Autocomplete
       freeSolo
       options={uniqueFamilies} // Use Family names as options
-      inputValue={inputValue.toLowerCase()}
+      inputValue={inputValue}
       onInputChange={handleInputChange}
       renderInput={(params) => (
         <TextField

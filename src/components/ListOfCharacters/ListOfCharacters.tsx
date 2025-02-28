@@ -102,8 +102,7 @@ const ListOfCharacters: React.FC = () => {
       }));
 
       setCharacters(formattedCharacters);
-      setTotalPages(Math.ceil(response.data.length / rowsPerPage));
-      setPaginatedCharacters(formattedCharacters.slice(page, rowsPerPage));
+      handlePaginationData(page, formattedCharacters)
       setLoading(false);
     } catch (error) {
       console.error("Error fetching character data:", error);
@@ -146,6 +145,12 @@ const ListOfCharacters: React.FC = () => {
   };
 
 
+  const handlePaginationData = (currentPage:number, updatedData:Character[]) => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    setTotalPages(Math.ceil(updatedData.length / rowsPerPage));
+    setPaginatedCharacters(updatedData.slice(startIndex, endIndex));
+  }
 
   // Update the number of items to show based on screen width and height
   useEffect(() => {
@@ -173,9 +178,7 @@ const ListOfCharacters: React.FC = () => {
 
 
   useEffect(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    setPaginatedCharacters(characterData.slice(startIndex, endIndex));
+    handlePaginationData(currentPage, characterData)
   }, [currentPage, characterData]);
 
 
@@ -199,11 +202,8 @@ const ListOfCharacters: React.FC = () => {
         );
       })
       .sort((a, b) => a.family.localeCompare(b.family));
-
-    const startIndex = (currentPage - 1) * rowsPerPage;  // Start index for slicing
-    const endIndex = startIndex + rowsPerPage;  // End index for slicing
-    setTotalPages(Math.ceil(filtered.length / rowsPerPage));
-    setPaginatedCharacters(filtered.slice(startIndex, endIndex));
+      //setting current page to one 
+      handlePaginationData(1, filtered)
   };
 
   //return 
