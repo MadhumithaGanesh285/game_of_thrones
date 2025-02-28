@@ -69,8 +69,11 @@
   padding-top: 3;
 }
 
+.MuiGrid-item {
+  padding: 2% !important;
+}
+
 .paginatedMainGrid {
-  padding-left: 22px;
   justify-content:center;
 }
 
@@ -89,6 +92,15 @@
   color: white !important;
   margin-top: 1;
   text-align: center;
+  font-size: 10px;
+}
+
+.characterCardExternal {
+  width: 130px;
+}
+
+.imageContained {
+  height: 119px;
 }
 
 /* Adjust layout for larger screens */
@@ -110,5 +122,20 @@
 
   .logo-text {
     font-size: 48px;
+  }
+
+  .imageContained {
+    height: 220px;
+  }
+
+  .paginatedTypoForMain {
+    color: white !important;
+    margin-top: 1;
+    text-align: center;
+    font-size: 22px;
+  }
+
+  .characterCardExternal {
+    width: 100%
   }
 }

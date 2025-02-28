@@ -37,7 +37,6 @@ const theme = createTheme();
 const CharacterCard = styled(Card)(() => ({
   border: "1px solid #ddd",
   borderRadius: "8px",
-  width: "100%",
   maxWidth: "250px",
   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
   backgroundColor: "#679a9f59",
@@ -51,7 +50,6 @@ const CharacterCard = styled(Card)(() => ({
 
 const ImageContainer = styled(Box)({
   width: "100%",
-  height: "220px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -204,18 +202,18 @@ const ListOfCharacters: React.FC = () => {
               ) : (
                 //this where api data render
                 paginatedCharacters.map((character) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={character.id}>
+                  <Grid item xs={6} sm={6} md={4} lg={3} key={character.id}>
                     <Link to={`/Characters/${character.id}`} className="redirect">
-                      <CharacterCard >
+                      <CharacterCard className="characterCardExternal">
                         <CardContent>
-                          <ImageContainer>
+                          <ImageContainer className="imageContained">
                             <img
                               src={character.imageUrl}
                               alt={character.name}
                               className="imageContainerImg"
                             />
                           </ImageContainer>
-                          <Typography variant="h6" sx={{ color: 'white' }} className="paginatedTypoForName">
+                          <Typography variant="h6" sx={{ color: 'white', fontSize:{xs:10, md:22}}} className="paginatedTypoForName">
                             {character.name}
                           </Typography>
                         </CardContent>
