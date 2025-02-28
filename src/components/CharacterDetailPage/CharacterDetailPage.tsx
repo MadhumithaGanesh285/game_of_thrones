@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 //import icons
-import { FaArrowLeft } from "react-icons/fa"; 
+import { FaArrowLeft } from "react-icons/fa";
 import { TbRefresh } from "react-icons/tb";
 
 //import CSS
@@ -11,6 +11,7 @@ import './CharacterDetial.css';
 
 //import Components
 import ChatBot from "../ChatBot/ChatBot";
+import { normalizeFamilyName } from "../../utils/familyUtils";
 
 //define interface
 interface Character {
@@ -36,62 +37,28 @@ const CharacterDetails: React.FC = () => {
       .then((response) => {
         const allCharacters = response.data;
 
+        // Find the selected character
         const selectedChar = allCharacters.find((char) => char.id.toString() === id);
+        if (!selectedChar) return;
 
-        if (selectedChar) {
-          setCharacter(selectedChar);
-          setSelectedDetails(selectedChar.fullName);
+        setCharacter(selectedChar);
+        setSelectedDetails(selectedChar.fullName);
+        // Normalize the family name
+        const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName);
 
-          //To avoid duplicate names of the selected Family
-          const familyName = normalizeFamilyName(selectedChar.family, selectedChar.fullName)
+        // Find characters with the same family name 
+        const filteredChars = allCharacters
+          .filter((char) => {
+            const normalizedFamily = normalizeFamilyName(char.family, char.fullName);
+            return normalizedFamily === familyName && char.id !== selectedChar.id;
+          })
+          .sort((a, b) => a.fullName.localeCompare(b.fullName)); // Sort by full name
 
-          // Find characters with the same last name (excluding current character)
-          const filteredChars = allCharacters.map((char) => ({
-            ...char,
-            family: normalizeFamilyName(char.family, char.fullName), // Normalize family name from the original response
-          }))
-            .sort((a, b) => a.family.localeCompare(b.family)) // Sort by family to prevent duplicate headers
-            .filter(
-              (char) => char.family === familyName && char.id !== selectedChar.id && familyName.toLowerCase().includes(char.family.toLowerCase()))
-
-          setRelatedCharacters(filteredChars);
-        }
+        setRelatedCharacters(filteredChars);
       })
       .catch((error) => console.error("Error fetching character details:", error));
   }, [id]);
 
-
-  const normalizeFamilyName = (family: string | null, fullName: string) => {
-    if (!family || family.trim() === "" || family.toLowerCase() === "none") return fullName;
-
-    const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
-
-    const familyMappings: Record<string, string> = {
-      "stark": "House Stark",
-
-      "lannister": "House Lannister",
-      "lanister": "House Lannister",
-
-      "targaryan": "House Targaryen",
-      "targaryen": "House Targaryen",
-
-      "baratheon": "House Baratheon",
-
-      "unknown": fullName,
-      "unkown": fullName, // Fix typo
-      "": fullName,
-      "none": fullName,
-
-      "bolton": "House Bolton",
-
-      "greyjoy": "House Greyjoy",
-      
-      "lorath": "House Lorathi",
-      "lorathi": "House Lorathi"
-    };
-
-    return familyMappings[cleanFamily] || family
-  };
 
   if (!character) return <h2>Loading...</h2>;
 
@@ -132,7 +99,7 @@ const CharacterDetails: React.FC = () => {
 
         {/* Related Family Members Header */}
         <div className="family-header">
-           <TbRefresh onClick={() => window.location.reload()} className="refresh-icon" />
+          <TbRefresh onClick={() => window.location.reload()} className="refresh-icon" />
           <h3>Family-{character.family}</h3>
           <button disabled className="record-button">
             {relatedCharacters.length} Record{relatedCharacters.length !== 1 ? "s" : ""}

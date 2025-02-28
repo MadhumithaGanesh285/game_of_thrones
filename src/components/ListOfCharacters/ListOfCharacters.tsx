@@ -20,6 +20,8 @@ import "./ListOfCharacters.css";
 
 //import Components
 import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
+import { normalizeFamilyName } from "../../utils/familyUtils";
+
 
 //define Interface
 interface Character {
@@ -98,7 +100,7 @@ const ListOfCharacters: React.FC = () => {
         imageUrl: character.imageUrl,
         house: character.house ? character.house.name : character.fullName,
         id: character.id ? character.id : 0,
-        family: normalizeFamilyName(character.family, character.fullName),
+        family: normalizeFamilyName(character.family,character.fullName)
       }));
 
       setCharacters(formattedCharacters);
@@ -109,41 +111,6 @@ const ListOfCharacters: React.FC = () => {
       setLoading(false);
     }
   };
-
-  //Duplication Family name is grouped together
-  const normalizeFamilyName = (family: string | null, fullName: string) => {
-    if (!family || family.toLowerCase() === "none") return fullName;
-
-    const cleanFamily = family.trim().toLowerCase().replace(/^house\s+/, ''); // Trim spaces & lowercase everything
-
-    const familyMappings: Record<string, string> = {
-      "stark": "House Stark",
-
-      "lannister": "House Lannister",
-      "lanister": "House Lannister",
-
-      "targaryan": "House Targaryen",
-      "targaryen": "House Targaryen",
-
-      "baratheon": "House Baratheon",
-
-      "unknown": fullName,
-      "unkown": fullName,
-      "": fullName,
-      "none": fullName,
-
-      "bolton": "House Bolton",
-
-      "greyjoy": "House Greyjoy",
-
-      "lorath": "House Lorathi",
-      "lorathi": "House Lorathi"
-
-    };
-
-    return familyMappings[cleanFamily] || family
-  };
-
 
   const handlePaginationData = (currentPage:number, updatedData:Character[]) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
