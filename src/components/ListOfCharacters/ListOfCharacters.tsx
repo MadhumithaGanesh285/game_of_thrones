@@ -68,7 +68,16 @@ const PaginationContainer = styled(Box)({
 
 //Component
 const ListOfCharacters: React.FC = () => {
-  const isMobile = useMediaQuery("(max-width:600px)");
+  const [itemsToShow, setItemsToShow] = useState<number>(8); // Default to 8 items
+
+  // Media queries for different screen conditions
+  const isWidthGreaterThanOrEqualTo1021 = useMediaQuery("(min-width:1021px)"); // Width >= 1021px
+  const isWidthLessThanOrEqualTo768 = useMediaQuery("(max-width:768px)"); // Width <= 768px
+  const isHeightLessThanOrEqualTo600 = useMediaQuery("(max-height:600px)"); // Height <= 600px
+  const isHeightLessThanOrEqualTo740 = useMediaQuery("(max-height:740px)"); // Height <= 650px
+  const isWidthGreaterThanOrEqualTo860 = useMediaQuery("(max-width:860px)"); // Width >= 860px
+  const isHeightGreaterThanOrEqualTo1024 = useMediaQuery("(min-height:1024px)"); // Width >= 1024px
+  const isHeightGreaterThanOrEqualTo1280 = useMediaQuery("(max-height:1280px)"); // Height <= 1280px
 
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
@@ -76,8 +85,8 @@ const ListOfCharacters: React.FC = () => {
   //Pagination States
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
-  const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([] );
-  const rowsPerPage = isMobile ? 4 : 8;
+  const [paginatedCharacters, setPaginatedCharacters] = useState<Character[]>([]);
+  const rowsPerPage = itemsToShow
 
   //Function to fetch Data
   const fetchCharacters = async (page: number) => {
@@ -136,6 +145,27 @@ const ListOfCharacters: React.FC = () => {
     return familyMappings[cleanFamily] || family
   };
 
+
+
+  // Update the number of items to show based on screen width and height
+  useEffect(() => {
+    if (isWidthGreaterThanOrEqualTo1021 && isHeightLessThanOrEqualTo600) {
+      setItemsToShow(3); // Width >= 1021px and Height <= 600px
+    } else if (isWidthLessThanOrEqualTo768 && (isHeightLessThanOrEqualTo740 || isHeightGreaterThanOrEqualTo1024)) {
+      setItemsToShow(4); // Width <= 540px and Height <= 740px
+    } else if (isWidthGreaterThanOrEqualTo860 && isHeightGreaterThanOrEqualTo1280) {
+      setItemsToShow(6); // Width >= 860px and Height >= 1280px
+    } else {
+      setItemsToShow(8); // Default to 8 items in all other cases
+    }
+  }, [
+    isWidthGreaterThanOrEqualTo1021,
+    isWidthLessThanOrEqualTo768,
+    isHeightLessThanOrEqualTo600,
+    isHeightLessThanOrEqualTo740,
+    isWidthGreaterThanOrEqualTo860,
+    isHeightGreaterThanOrEqualTo1280,
+  ]);
   //this load intially and when we change a page
   useEffect(() => {
     fetchCharacters(currentPage);
@@ -153,7 +183,7 @@ const ListOfCharacters: React.FC = () => {
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-  
+
   //Searching Values
   const handleSearch = (event: React.SyntheticEvent, value: string) => {
     const searchValue = value.toLowerCase();
@@ -195,7 +225,7 @@ const ListOfCharacters: React.FC = () => {
         {/* Centered Content */}
         <Container maxWidth="lg" className="contentCentered">
           {/* Character Grid */}
-          <Box p={2}>
+          <Box p={1}>
             <Grid container spacing={3} className="paginatedMainGrid">
               {loading ? (
                 <Typography variant="h5">Loading...</Typography>
@@ -213,7 +243,7 @@ const ListOfCharacters: React.FC = () => {
                               className="imageContainerImg"
                             />
                           </ImageContainer>
-                          <Typography variant="h6" sx={{ color: 'white', fontSize:{xs:10, md:22}}} className="paginatedTypoForName">
+                          <Typography variant="h6" sx={{ color: 'white', fontSize: { xs: 10, md: 22 } }} className="paginatedTypoForName">
                             {character.name}
                           </Typography>
                         </CardContent>
@@ -223,18 +253,17 @@ const ListOfCharacters: React.FC = () => {
                 ))
               )}
             </Grid>
+            {/* Pagination */}
+            <PaginationContainer>
+              <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} style={{ backgroundColor: currentPage === 1 ? "#ddd" : "#1976d2" }} disabled={currentPage === 1}>
+                Previous
+              </Button>
+              <Typography variant="h6" sx={{ color: 'white' }}>{currentPage} / {totalPages}</Typography>
+              <Button variant="contained" style={{ backgroundColor: currentPage === totalPages ? "#ddd" : "#1976d2" }} onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                Next
+              </Button>
+            </PaginationContainer>
           </Box>
-
-          {/* Pagination */}
-          <PaginationContainer>
-            <Button variant="contained" onClick={() => handlePageChange(currentPage - 1)} style={{ backgroundColor: currentPage === 1 ? "#ddd" : "#1976d2" }} disabled={currentPage === 1}>
-              Previous
-            </Button>
-            <Typography variant="h6" sx={{ color: 'white' }}>{currentPage} / {totalPages}</Typography>
-            <Button variant="contained" style={{ backgroundColor: currentPage === totalPages ? "#ddd" : "#1976d2" }} onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-              Next
-            </Button>
-          </PaginationContainer>
         </Container>
       </div>
     </ThemeProvider>

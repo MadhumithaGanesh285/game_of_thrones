@@ -1,5 +1,6 @@
 .MainDivForCharacterList {
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -66,15 +67,16 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  padding-top: 3;
+  padding:0% !important
 }
 
 .MuiGrid-item {
-  padding: 2% !important;
+  padding: 5% !important;
 }
 
 .paginatedMainGrid {
   justify-content:center;
+  padding-left: 5%;
 }
 
 .redirect {
@@ -137,5 +139,20 @@
 
   .characterCardExternal {
     width: 100%
+  }
+
+  .backgroundImageDiv {
+    height: 100vh;
+  }
+
+  .MuiGrid-item {
+    padding: 2% !important;
+  }
+}
+
+/* Adjust layout for larger screens */
+@media (min-width: 1280px) or (min-height: 1180px) { 
+  .backgroundImageDiv {
+    height: 108vh;
   }
 }

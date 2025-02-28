@@ -57,7 +57,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ characterData, onSear
           variant="outlined"
           fullWidth
           sx={{
-            width: 300,
+            width: {xs:'250px', md:'300px'},
             backgroundColor: 'white', // Ensures input background is always white
             '& .MuiInputLabel-root': {
               backgroundColor: 'white', // Keeps label background white
