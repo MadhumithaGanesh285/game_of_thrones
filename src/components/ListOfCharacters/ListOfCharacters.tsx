@@ -84,6 +84,9 @@ const ListOfCharacters: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [characterData, setCharacters] = useState<Character[]>([]);
 
+  //Search
+  const [filteredCharacters, setFilteredCharacters] = useState<Character[]>(characterData);
+
   //Pagination States
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -104,20 +107,12 @@ const ListOfCharacters: React.FC = () => {
       }));
 
       setCharacters(formattedCharacters);
-      handlePaginationData(page, formattedCharacters)
       setLoading(false);
     } catch (error) {
       console.error("Error fetching character data:", error);
       setLoading(false);
     }
   };
-
-  const handlePaginationData = (currentPage:number, updatedData:Character[]) => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    setTotalPages(Math.ceil(updatedData.length / rowsPerPage));
-    setPaginatedCharacters(updatedData.slice(startIndex, endIndex));
-  }
 
   // Update the number of items to show based on screen width and height
   useEffect(() => {
@@ -141,23 +136,30 @@ const ListOfCharacters: React.FC = () => {
   //this load intially and when we change a page
   useEffect(() => {
     fetchCharacters(currentPage);
-  }, [currentPage]);
+  }, []);
 
 
   useEffect(() => {
-    handlePaginationData(currentPage, characterData)
-  }, [currentPage, characterData]);
+    const dataToPaginate = filteredCharacters.length > 0 ? filteredCharacters : characterData; // Use filtered data or all data
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    setTotalPages(Math.ceil(dataToPaginate.length / rowsPerPage));
+    setPaginatedCharacters(dataToPaginate.slice(startIndex, endIndex));
+  }, [currentPage, filteredCharacters, characterData]);
 
 
   //Setting new page number
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    debugger
+    // Ensure the newPage is within bounds
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
   };
 
   //Searching Values
   const handleSearch = (event: React.SyntheticEvent, value: string) => {
     const searchValue = value.toLowerCase();
-
     //It search for Character, Family Name and Grouping duplicate Family Name Search
     const filtered = characterData
       .filter(character => {
@@ -169,8 +171,8 @@ const ListOfCharacters: React.FC = () => {
         );
       })
       .sort((a, b) => a.family.localeCompare(b.family));
-      //setting current page to one 
-      handlePaginationData(1, filtered)
+      setFilteredCharacters(filtered);
+      setCurrentPage(1);
   };
 
   //return 
