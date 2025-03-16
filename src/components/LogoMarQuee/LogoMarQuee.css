@@ -1,0 +1,29 @@
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 50%;
+  background: #5f695914;
+  padding: 10px 0;
+}
+
+.marquee__inner {
+  display: flex;
+  gap: 40px; /* Space between logos */
+  animation: marquee 15s linear infinite;
+}
+
+.logo {
+  height: 50px; /* Adjust logo size */
+  width: auto;
+  max-width: 150px;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

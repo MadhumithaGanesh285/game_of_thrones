@@ -21,7 +21,7 @@ import "./ListOfCharacters.css";
 //import Components
 import SearchComponent from "../SerachFamilyOrCharacter/SearchFamilyOrCharacter";
 import { normalizeFamilyName } from "../../utils/familyUtils";
-
+import LogoMarquee from "../LogoMarQuee/LogoMarQuee";
 
 //define Interface
 interface Character {
@@ -66,6 +66,7 @@ const PaginationContainer = styled(Box)({
   marginTop: "16px",
   padding: "16px",
 });
+
 
 
 //Component
@@ -189,6 +190,7 @@ const ListOfCharacters: React.FC = () => {
             <SearchComponent characterData={characterData} onSearch={handleSearch} />
           </Box>
         </Box>
+        <LogoMarquee />
         {/* Background Image */}
         <div className="backgroundImageDiv"></div>
         {/* Centered Content */}
